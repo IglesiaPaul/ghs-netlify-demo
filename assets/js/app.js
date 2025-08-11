@@ -1,9 +1,11 @@
-/* ===== Global Hemp Service — app.js (single source) =====
+
+/* ===== Global Hemp Service — app.js (clean build) =====
    - Persists cart + WETAS to localStorage (with safe fallback)
+   - Catalog + unified product renderer
    - Mobile menu (overlay + hamburger)
-   - Product grid renders with links to product.html?id=...
-   - Lazy-loaded images with fixed intrinsic size to prevent layout shift
-   - No investor tour code
+   - Auto-render on Home (#products-grid) + Marketplace (#market-grid)
+   - Carbon Lab link: canonicalize + dedupe
+   - Wallet link: subtle gold glow
 ============================================================= */
 
 /* --------------- Safe storage wrapper --------------- */
@@ -36,10 +38,11 @@ const State = {
   cart: [],
   user: {
     name: "Guest",
-    country: Intl.DateTimeFormat().resolvedOptions().timeZone || "Local",
+    country: (Intl.DateTimeFormat().resolvedOptions().timeZone || "Local"),
     currency: (Intl.NumberFormat().resolvedOptions().currency) || "EUR",
   },
   tokens: { ...DefaultTokens },
+  products: [] // set below to Catalog
 };
 
 /* --------------- Persistence helpers --------------- */
@@ -49,7 +52,6 @@ function saveState() {
     storage.set(STORAGE.tokens, JSON.stringify(State.tokens));
   } catch (e) {}
 }
-
 function loadState() {
   try {
     const cart = JSON.parse(storage.get(STORAGE.cart) || "[]");
@@ -59,7 +61,7 @@ function loadState() {
   } catch (e) {}
 }
 
-/* --------------- Reset --------------- */
+/* --------------- Reset (demo) --------------- */
 function resetDemo() {
   State.cart = [];
   State.tokens = { ...DefaultTokens };
@@ -79,8 +81,8 @@ const Catalog = [
   { id: 5, name: "Hemp Tote Bag", vendor: "Loom&Leaf", category: "Accessories", price: 18, img: "assets/img/products/tote-bag.png" },
   { id: 6, name: "Hemp Rope 10m", vendor: "Mariner", category: "Industrial", price: 12, img: "assets/img/products/rope-coil.png" },
 ];
-
 const TokenRules = { Apparel: 2, Food: 3, Construction: 8, Wellness: 2, Accessories: 1, Industrial: 5 };
+State.products = Catalog;
 
 /* --------------- Cart + Wallet --------------- */
 function addToCart(id) {
@@ -91,37 +93,35 @@ function addToCart(id) {
   else State.cart.push({ ...p, qty: 1 });
   saveState();
   renderCartBadge();
-  // Small haptic/feedback on mobile (vibrate if supported)
+  // Small haptic/feedback on mobile
   if (navigator.vibrate) try { navigator.vibrate(16); } catch(e){}
   alert(`Added to cart: ${p.name}`);
 }
-
 function renderCartBadge() {
   const n = State.cart.reduce((a, b) => a + b.qty, 0);
   const el = document.querySelector("#cart-badge");
   if (el) el.textContent = n;
 }
-
 function currency(n) {
-  return new Intl.NumberFormat(undefined, { style: "currency", currency: "EUR" }).format(n);
+  try {
+    return new Intl.NumberFormat(undefined, { style: "currency", currency: "EUR" }).format(n).replace(/\u00a0/g,' ');
+  } catch(e) {
+    return "€" + Number(n).toFixed(2);
+  }
 }
 
-/* === Unified product renderer (home hero cards) === */
+/* === Unified product renderer (home + marketplace cards) === */
 function renderProducts(containerId, items) {
   const el = document.getElementById(containerId) || document.querySelector(containerId);
   if (!el) return;
 
-  // If your grid container is INSIDE a <section class="home-hero"> wrapper,
-  // leave this as-is. (See Step 4 below.)
-  if (!el.classList.contains('grid')) {
-    el.classList.add('grid');
-  }
+  if (!el.classList.contains('grid')) el.classList.add('grid');
 
   el.innerHTML = (items || []).map(p => {
-    const price = (p.price != null) ? Number(p.price).toFixed(2) : "";
-    const brand = p.brand || p.company || "";
+    const price = (p.price != null) ? Number(p.price) : null;
+    const brand = p.brand || p.vendor || p.company || "";
     const category = p.category || "";
-    const img = p.image || p.img || "";
+    const img = p.image || p.img || p.thumbnail || "";
     const imgSrc = img.startsWith("assets/") ? img : ("assets/img/products/" + img);
     const viewHref = "product.html?id=" + encodeURIComponent(p.id);
 
@@ -137,25 +137,22 @@ function renderProducts(containerId, items) {
         ${p.desc ? `<div class="p-desc">${p.desc}</div>` : ``}
         <div class="p-actions">
           <a class="p-link" href="${viewHref}" aria-label="View ${p.name}">View</a>
-          <button class="p-add" data-add="${p.id}" aria-label="Add ${p.name} to cart">${price ? `Add • $${price}` : `Add to cart`}</button>
+          <button class="p-add" data-add="${p.id}" aria-label="Add ${p.name} to cart">${price != null ? `Add • ${currency(price)}` : `Add to cart`}</button>
         </div>
       </div>
     </article>`;
   }).join("");
 
-  // Re-run hero micro-interactions if the page script listens to DOMContentLoaded
-  try { if (window.dispatchEvent) window.dispatchEvent(new Event("DOMContentLoaded")); } catch(e){}
+  // Event delegation for add buttons within this container
+  el.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-add]");
+    if (!btn) return;
+    const id = parseInt(btn.getAttribute("data-add"), 10);
+    if (!isNaN(id)) addToCart(id);
+  }, { passive: true });
 }
 
-  // Delegate add-to-cart buttons
-  grid.querySelectorAll("button[data-add]").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const id = parseInt(btn.getAttribute("data-add"), 10);
-      addToCart(id);
-    });
-  });
-}
-
+/* --------------- Cart page render --------------- */
 function renderCartPage() {
   const table = document.querySelector("#cart-table");
   const totalEl = document.querySelector("#cart-total");
@@ -168,13 +165,14 @@ function renderCartPage() {
     total += line;
     tokens += (TokenRules[item.category] || 1) * item.qty;
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${item.name}</td><td>${item.vendor}</td><td>${item.category}</td><td>${item.qty}</td><td>${currency(line).replace(/\u00a0/g,' ')}</td>`;
+    tr.innerHTML = `<td>${item.name}</td><td>${item.vendor||""}</td><td>${item.category||""}</td><td>${item.qty}</td><td>${currency(line)}</td>`;
     table.appendChild(tr);
   }
-  if (totalEl) totalEl.textContent = currency(total).replace(/\u00a0/g,' ');
+  if (totalEl) totalEl.textContent = currency(total);
   if (tokensEl) tokensEl.textContent = tokens + " WETAS";
 }
 
+/* --------------- Checkout + Wallet --------------- */
 function checkout() {
   const tokensEarned = State.cart.reduce((sum, i) => sum + (TokenRules[i.category] || 1) * i.qty, 0);
   State.tokens.balance += tokensEarned;
@@ -184,7 +182,6 @@ function checkout() {
   alert(`Checkout simulated!\nWETAS earned: ${tokensEarned}`);
   window.location.href = "wallet.html";
 }
-
 function renderWallet() {
   const bal = document.querySelector("#token-balance");
   const tier = document.querySelector("#token-tier");
@@ -199,7 +196,7 @@ function renderWallet() {
   }
 }
 
-/* --------------- Mobile menu --------------- */
+/* --------------- Mobile menu (baseline) --------------- */
 function setupMobileMenu() {
   const btn = document.getElementById("menu-toggle");
   const menu = document.getElementById("main-menu");
@@ -210,8 +207,17 @@ function setupMobileMenu() {
   btn.addEventListener("click", () => { menu.classList.contains("open") ? close() : open(); }, {passive:true});
   overlay.addEventListener("click", close, {passive:true});
   menu.addEventListener("click", (e) => { if (e.target.tagName === "A") close(); }, {passive:true});
-  // Auto-close if switching to desktop width
   window.addEventListener("resize", () => { if (window.innerWidth > 900) close(); }, {passive:true});
+}
+
+/* --------------- Auto-render on Home + Marketplace --------------- */
+function renderHomeAndMarket(){
+  if (document.getElementById("products-grid")) {
+    renderProducts("products-grid", State.products);
+  }
+  if (document.getElementById("market-grid")) {
+    renderProducts("market-grid", State.products);
+  }
 }
 
 /* --------------- Init --------------- */
@@ -219,9 +225,15 @@ document.addEventListener("DOMContentLoaded", () => {
   loadState();
   renderCartBadge();
   setupMobileMenu();
+  renderHomeAndMarket();
+
   // Wire Reset button if present
   const resetBtn = document.getElementById("reset-btn");
   if (resetBtn) resetBtn.addEventListener("click", (e) => { e.preventDefault(); resetDemo(); });
+
+  // If we're on wallet or cart pages, render their sections
+  if (document.querySelector("#cart-table")) renderCartPage();
+  if (document.querySelector("#token-balance")) renderWallet();
 });
 
 /* === Carbon Lab nav module (v2): canonicalize + dedupe desktop & mobile === */
@@ -251,9 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/^\//, "")
       .replace(/\?.*$/, "")
       .replace(/#.*$/, "");
-    // Drop trailing slash
     if (p.endsWith("/")) p = p.slice(0,-1);
-    // Canonicalize Carbon Lab variants
     const pl = p.toLowerCase();
     if (pl === "carbon-lab" || pl === "carbon-lab/index" || pl === "carbon-lab/index.html") p = "carbon-lab.html";
     return p;
@@ -262,10 +272,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function ensureSingleLabLink(){
     const nav = document.getElementById("main-menu") || document.querySelector(".menu");
     if (!nav) return;
-
     const anchors = Array.from(nav.querySelectorAll("a"));
     const labAnchors = anchors.filter(a => normalizeHref(a) === "carbon-lab.html");
-
     if (labAnchors.length === 0){
       const link = document.createElement("a");
       link.className = "lab-link";
@@ -275,7 +283,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (afterCarbon && afterCarbon.parentNode) afterCarbon.insertAdjacentElement("afterend", link);
       else nav.insertAdjacentElement("afterbegin", link);
     } else {
-      // Keep the first; remove the rest, and normalize the first
       for (let i=1;i<labAnchors.length;i++) labAnchors[i].remove();
       const first = labAnchors[0];
       first.classList.add("lab-link");
@@ -287,7 +294,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function initOffcanvas(){
     if (window.__ghsOffcanvasV2) return;
     window.__ghsOffcanvasV2 = true;
-
     const btn = document.getElementById("menu-toggle");
     const src = document.getElementById("main-menu") || document.querySelector(".menu");
     if (!btn || !src) return;
@@ -322,7 +328,6 @@ document.addEventListener("DOMContentLoaded", () => {
       src.querySelectorAll("a").forEach(a=>{
         let key = normalizeHref(a);
         if (!key) return;
-        // Canonicalize lab variants to a single key
         if (key === "carbon-lab") key = "carbon-lab.html";
         if (seen.has(key)) return;
         seen.add(key);
@@ -341,14 +346,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function open(){ rebuild(); panel.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow="hidden"; }
     function close(){ panel.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow=""; }
     function toggle(){ panel.classList.contains("open") ? close() : open(); }
-
     btn.addEventListener("click", toggle);
     overlay.addEventListener("click", close);
     document.addEventListener("keydown", e=>{ if(e.key==="Escape") close(); });
-
-    new MutationObserver(()=>{ ensureSingleLabLink(); rebuild(); })
-      .observe(src, {childList:true, subtree:true});
-
+    new MutationObserver(()=>{ ensureSingleLabLink(); rebuild(); }).observe(src, {childList:true, subtree:true});
     window.__ghsRebuildOffcanvas = rebuild;
   }
 
@@ -358,15 +359,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
-  setTimeout(init, 600); // catch late injections
+  setTimeout(init, 600);
 })();
 
 /* === Wallet link highlight (gold glow, low-impact, no balance) === */
 (function(){
   if (window.__ghsWalletGlowInit) return;
   window.__ghsWalletGlowInit = true;
-
-  // 1) Inject styles once (works in header .menu and mobile .ghs-menu)
   if (!document.getElementById("wallet-link-style")) {
     const style = document.createElement("style");
     style.id = "wallet-link-style";
@@ -389,8 +388,6 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     document.head.appendChild(style);
   }
-
-  // 2) Tag the Wallet link(s) so clones in the off-canvas keep the look
   function markWalletLinks(){
     const nav = document.getElementById('main-menu') || document.querySelector('.menu');
     if (!nav) return;
@@ -403,18 +400,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!/wallet/i.test(a.innerHTML)) { a.innerHTML = '<span>Wallet</span>'; }
       }
     });
-    // If a mobile drawer exists already, re-clone to pick up the class
     if (window.__ghsRebuildOffcanvas) window.__ghsRebuildOffcanvas();
   }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', markWalletLinks);
-  } else {
-    markWalletLinks();
-  }
-  // Re-apply after any nav mutations (e.g., when Carbon Lab is injected/deduped)
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', markWalletLinks);
+  else markWalletLinks();
   const nav = document.getElementById('main-menu') || document.querySelector('.menu');
   if (nav) new MutationObserver(markWalletLinks).observe(nav, {childList:true, subtree:true});
-  setTimeout(markWalletLinks, 400); // catch late injections
+  setTimeout(markWalletLinks, 400);
 })();
-
