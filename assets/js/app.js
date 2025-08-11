@@ -303,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
       s.textContent = `
 #ghs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s;z-index:2990}
 #ghs-overlay.open{opacity:1;pointer-events:auto}
-#ghs-offcanvas{position:fixed;top:0;left:0;bottom:0;width:min(82vw,380px);transform:translateX(-110%);transition:transform .22s ease;z-index:3000;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:16px 12px;overflow:auto}
+#ghs-offcanvas{position:fixed;top:0;left:0;bottom:0;width:min(82vw,380px);transform:translateX(-110%);transition:transform .22s ease;z-index:4000;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:16px 12px;overflow:auto}
 #ghs-offcanvas.open{transform:translateX(0)}
 #ghs-offcanvas .ghs-menu a{display:block;padding:12px 10px;border-radius:10px;font-weight:700;text-decoration:none;color:#0b4b3f}
 #ghs-offcanvas .ghs-menu a:hover{background:#f0fffb}
@@ -430,9 +430,11 @@ document.addEventListener("DOMContentLoaded", () => {
 .hamburger{ display:inline-flex; align-items:center; justify-content:center; }
 
 /* Drawer visuals + highlight pills */
+#menu-overlay{display:none !important}
+
 #ghs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s;z-index:2990}
 #ghs-overlay.open{opacity:1;pointer-events:auto}
-#ghs-offcanvas{position:fixed;top:0;left:0;bottom:0;width:min(82vw,380px);transform:translateX(-110%);transition:transform .22s ease;z-index:3000;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:16px 12px;overflow:auto}
+#ghs-offcanvas{position:fixed;top:0;left:0;bottom:0;width:min(82vw,380px);transform:translateX(-110%);transition:transform .22s ease;z-index:4000;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:16px 12px;overflow:auto}
 #ghs-offcanvas.open{transform:translateX(0)}
 #ghs-offcanvas .ghs-menu a{display:block;padding:12px 12px;border-radius:12px;font-weight:700;text-decoration:none;color:#0b4b3f;margin:2px 0}
 #ghs-offcanvas .ghs-menu a:hover{background:#f0fffb}
@@ -558,7 +560,7 @@ a.cart-link .badge{ background:#0d1b16; color:#c8fff0; border:1px solid #143d31;
     function close(){ panel.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow=""; btn.setAttribute("aria-expanded","false"); }
     function toggle(){ panel.classList.contains("open") ? close() : open(); }
 
-    if (!btn.__ghsBound){ btn.addEventListener("click", toggle); btn.__ghsBound = true; }
+    if (!btn.__ghsBound){ btn.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); toggle(); }, {capture:true}); btn.__ghsBound = true; }
     if (!overlay.__ghsBound){ overlay.addEventListener("click", close); overlay.__ghsBound = true; }
     document.addEventListener("keydown", (e)=>{ if (e.key === "Escape") close(); });
     // Keep in sync with header nav changes
