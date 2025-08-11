@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Home — Global Hemp Service</title>
+  <title>Global Hemp Service — Hemp, from Soil to Soul.</title>
   <link rel="stylesheet" href="assets/css/style.css"/>
-  <link rel="stylesheet" href="assets/css/style.homehero.css"/>
+  <link rel="stylesheet" href="assets/css/style.homepage.css"/>
   <link rel="icon" href="data:,">
 </head>
 <body>
@@ -33,22 +33,49 @@
   </header>
 
   <main>
-    <section class="home-hero container">
-      <header class="hero-head" style="margin-bottom:12px">
-        <h1>Hemp, from Soil to Soul.</h1>
-        <p class="small">Explore a multivendor marketplace for hemp materials, wellness, and future-proof products.</p>
-      </header>
-      <div id="products-grid" class="grid"></div>
-    </section>
-
-    <section class="container" style="margin-top:24px">
-      <h2>Why join as a brand?</h2>
-      <div class="grid cols-3">
-        <div class="card"><b>Custom storefronts</b><br/>Own your colorways, layout, and brand moments.</div>
-        <div class="card"><b>Geo-targeted distribution</b><br/>Web, WeChat mini-program, LINE stores, and more.</div>
-        <div class="card"><b>WETAS rewards</b><br/>Carbon-linked perks drive repeat purchases.</div>
+    <!-- Marketplace teaser -->
+    <section id="teaser-marketplace" class="teaser market">
+      <div class="inner container">
+        <div>
+          <h1>Discover the hemp marketplace</h1>
+          <p class="lead">Materials, wellness, and next‑gen products, curated across brands. One place to browse, compare, and buy.</p>
+          <div class="cta-row">
+            <a class="cta-btn" href="marketplace.html"><span class="label">Explore marketplace →</span></a>
+          </div>
+        </div>
+        <div class="art" aria-hidden="true"></div>
       </div>
     </section>
+
+    <!-- Carbon Lab teaser -->
+    <section id="teaser-lab" class="teaser lab">
+      <div class="inner container">
+        <div>
+          <h2>Play in the Carbon Lab</h2>
+          <p class="lead">Mix swaps in the cauldron and see CO₂e and water savings in real time. Earn WETAS for smarter choices.</p>
+          <div class="cta-row">
+            <a class="cta-btn" href="carbon-lab.html"><span class="label">Open Carbon Lab ✨</span></a>
+          </div>
+        </div>
+        <div class="art" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- Wallet teaser -->
+    <section id="teaser-wallet" class="teaser wallet">
+      <div class="inner container">
+        <div>
+          <h2>Your WETAS Wallet</h2>
+          <p class="lead">Collect tokens as you reduce impact. Redeem for perks, access, and planet‑positive rewards.</p>
+          <div class="cta-row">
+            <a class="cta-btn" href="wallet.html"><span class="label">Go to Wallet</span></a>
+          </div>
+        </div>
+        <div class="art" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
   </main>
 
   <footer>
@@ -58,8 +85,7 @@
   <script>
     try { const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; const el = document.getElementById("geo-badge"); if (el) el.textContent = tz; } catch(e){}
   </script>
-  <script src="assets/js/app.js?v=2025-08-12-3" defer></script>
-  <script src="assets/js/app.patches.js?v=2025-08-12-2" defer></script>
-  <script src="assets/js/home.hero.js?v=2025-08-11-13" defer></script>
+  <script src="assets/js/app.js?v=2025-08-12-6" defer></script>
+  <script src="assets/js/home.teasers.js?v=2025-08-12-teasers" defer></script>
 </body>
 </html>
