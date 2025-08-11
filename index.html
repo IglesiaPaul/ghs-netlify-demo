@@ -1,14 +1,17 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Home — Global Hemp Service</title>
+  <!-- Base site styles + home hero cards -->
+  <link rel="stylesheet" href="assets/css/style.css"/>
   <link rel="stylesheet" href="assets/css/style.homehero.css"/>
+  <!-- Quiet 404 favicon warning -->
+  <link rel="icon" href="data:,">
 </head>
-  
 <body>
-  
+
 <header>
   <div id="menu-overlay"></div>
   <div class="nav">
@@ -40,7 +43,37 @@
   </div>
 </header>
 
+<main>
+  <!-- START: Home hero block -->
+  <section class="home-hero container">
+    <header class="hero-head" style="margin-bottom:12px">
+      <h1>Hemp, from Soil to Soul.</h1>
+      <p class="small">Explore a multivendor marketplace for hemp materials, wellness, and future‑proof products.</p>
+    </header>
+
+    <!-- Grid target for renderProducts(...) -->
+    <div id="products-grid" class="grid"></div>
+  </section>
+  <!-- END: Home hero block -->
+
+  <section class="container" style="margin-top:24px">
+    <h2>Why join as a brand?</h2>
+    <div class="grid cols-3">
+      <div class="card"><b>Custom storefronts</b><br/>Own your colorways, layout, and brand moments (Tmall-style).</div>
+      <div class="card"><b>Geo-targeted distribution</b><br/>Web, WeChat mini-program, LINE stores, and more.</div>
+      <div class="card"><b>WETAS rewards</b><br/>Carbon-linked perks drive repeat purchases.</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container small">
+    <div>© 2025 Global Hemp Service — Demo. | <a href="privacy.html">Privacy</a> | <a href="terms.html">Terms</a> | <a href="cookies.html">Cookies</a></div>
+  </div>
+</footer>
+
 <script>
+  // Geo badge
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const el = document.getElementById("geo-badge");
@@ -48,28 +81,8 @@
   } catch(e) {}
 </script>
 
-  
-<section class="home-hero">
-  <div id="products-grid" class="grid"></div>
-</section>
-
-<div class="container">
-  <h2>Why join as a brand?</h2>
-  <div class="grid cols-3">
-    <div class="card"><b>Custom storefronts</b><br/>Own your colorways, layout, and brand moments (Tmall-style).</div>
-    <div class="card"><b>Geo-targeted distribution</b><br/>Web, WeChat mini-program, LINE stores, and more.</div>
-    <div class="card"><b>WETAS rewards</b><br/>Carbon-linked perks drive repeat purchases.</div>
-  </div>
-</div>
-
-  
-<footer>
-  <div class="container small">
-    <div>© 2025 Global Hemp Service — Demo. | <a href="privacy.html">Privacy</a> | <a href="terms.html">Terms</a> | <a href="cookies.html">Cookies</a></div>
-  </div>
-</footer>
-<script src="assets/js/app.js?v=2025-08-11-4"></script>
-
+<!-- App + hero interactions (defer to avoid blocking render) -->
+<script src="assets/js/app.js?v=2025-08-12-1" defer></script>
 <script src="assets/js/home.hero.js?v=2025-08-11-13" defer></script>
 </body>
 </html>
