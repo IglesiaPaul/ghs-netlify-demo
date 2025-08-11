@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Brand — Global Hemp Service</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="logo"><span class="logo-badge"></span> Global Hemp Service</div>
+      <nav class="menu">
+        <a href="index.html">Home</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="wallet.html">Wallet</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h1 id="brand-name">Brand</h1>
+      <p>This brand profile page is coming soon. In the meantime, you can explore products on the <a href="marketplace.html">Marketplace</a>.</p>
+    </div>
+  </div>
+
+  <footer><div class="container small">© 2025 Global Hemp Service — Demo.</div></footer>
+  <script>
+    const qp = new URLSearchParams(location.search);
+    const v = qp.get("v") || "brand";
+    document.getElementById("brand-name").textContent = v.replace(/[-]/g," ").replace(/\b\w/g, m => m.toUpperCase());
+  </script>
+</body>
+</html>
