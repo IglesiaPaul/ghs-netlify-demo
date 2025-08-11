@@ -203,3 +203,53 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetBtn = document.getElementById("reset-btn");
   if (resetBtn) resetBtn.addEventListener("click", (e) => { e.preventDefault(); resetDemo(); });
 });
+
+/* === Inject "Carbon Lab" nav link + styles on every page === */
+(function () {
+  // 1) Add the twist/glow styles if not present
+  if (!document.getElementById("lab-link-style")) {
+    const css = `
+      .menu a.lab-link{position:relative; display:inline-block; border-radius:999px; padding:6px 10px; font-weight:700; overflow:hidden; border:1px solid #d9f8ef}
+      .menu a.lab-link::before{content:""; position:absolute; inset:-30%; background:conic-gradient(from 0deg, rgba(56,226,181,.4), transparent 40%, rgba(56,226,181,.35) 60%, transparent 100%); animation:twist 4.8s linear infinite; z-index:0; filter:blur(10px)}
+      .menu a.lab-link span{position:relative; z-index:1}
+      @keyframes twist{ to { transform:rotate(360deg);} }
+      @media (prefers-reduced-motion: reduce){ .menu a.lab-link::before{ animation:none !important } }
+    `;
+    const style = document.createElement("style");
+    style.id = "lab-link-style";
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  // 2) Add the nav link if it's missing
+  function addLink() {
+    const nav = document.querySelector("#main-menu") || document.querySelector(".menu");
+    if (!nav) return;
+
+    // Already there? bail.
+    if (nav.querySelector('a[href$="carbon-lab.html"]')) return;
+
+    const link = document.createElement("a");
+    link.className = "lab-link";
+    link.href = "carbon-lab.html";
+    link.innerHTML = '<span>Carbon Lab ✨</span>';
+
+    // Try to place it right after "Carbon Program" if that exists
+    const afterCarbon = Array.from(nav.querySelectorAll("a")).find(a =>
+      /carbon\s*program/i.test(a.textContent || "")
+    );
+    if (afterCarbon && afterCarbon.parentNode) {
+      afterCarbon.insertAdjacentElement("afterend", link);
+    } else {
+      // Otherwise put it near the front
+      nav.insertAdjacentElement("afterbegin", link);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", addLink);
+  } else {
+    addLink();
+  }
+})();
+
