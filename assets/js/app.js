@@ -204,68 +204,72 @@ document.addEventListener("DOMContentLoaded", () => {
   if (resetBtn) resetBtn.addEventListener("click", (e) => { e.preventDefault(); resetDemo(); });
 });
 
-/* === Inject "Carbon Lab" nav link + styles on every page === */
-(function () {
-  // 1) Add the twist/glow styles if not present
+/* === Carbon Lab nav: style + single-link guarantee (desktop & mobile) === */
+(function(){
+  if (window.__ghsLabLinkInit) return;
+  window.__ghsLabLinkInit = true;
+
+  // 1) Inject twist/glow styles once
   if (!document.getElementById("lab-link-style")) {
-    const css = `
+    const style = document.createElement("style");
+    style.id = "lab-link-style";
+    style.textContent = `
       .menu a.lab-link{position:relative; display:inline-block; border-radius:999px; padding:6px 10px; font-weight:700; overflow:hidden; border:1px solid #d9f8ef}
       .menu a.lab-link::before{content:""; position:absolute; inset:-30%; background:conic-gradient(from 0deg, rgba(56,226,181,.4), transparent 40%, rgba(56,226,181,.35) 60%, transparent 100%); animation:twist 4.8s linear infinite; z-index:0; filter:blur(10px)}
       .menu a.lab-link span{position:relative; z-index:1}
       @keyframes twist{ to { transform:rotate(360deg);} }
       @media (prefers-reduced-motion: reduce){ .menu a.lab-link::before{ animation:none !important } }
     `;
-    const style = document.createElement("style");
-    style.id = "lab-link-style";
-    style.textContent = css;
     document.head.appendChild(style);
   }
 
-  // 2) Add the nav link if it's missing
-  function addLink() {
-    const nav = document.querySelector("#main-menu") || document.querySelector(".menu");
+  function normalizeHref(a){
+    const raw = (typeof a === "string" ? a : (a.getAttribute && a.getAttribute("href")) || "") || "";
+    return raw
+      .replace(location.origin, "")
+      .replace(/^[a-z]+:\/\//i, "")
+      .replace(/^\//, "")
+      .replace(/\?.*$/, "")
+      .replace(/#.*$/, "");
+  }
+
+  function ensureSingleLabLink(){
+    const nav = document.getElementById("main-menu") || document.querySelector(".menu");
     if (!nav) return;
 
-    // Already there? bail.
-    if (nav.querySelector('a[href$="carbon-lab.html"]')) return;
-
-    const link = document.createElement("a");
-    link.className = "lab-link";
-    link.href = "carbon-lab.html";
-    link.innerHTML = '<span>Carbon Lab ✨</span>';
-
-    // Try to place it right after "Carbon Program" if that exists
-    const afterCarbon = Array.from(nav.querySelectorAll("a")).find(a =>
-      /carbon\s*program/i.test(a.textContent || "")
-    );
-    if (afterCarbon && afterCarbon.parentNode) {
-      afterCarbon.insertAdjacentElement("afterend", link);
+    const anchors = Array.from(nav.querySelectorAll("a"));
+    const labAnchors = anchors.filter(a => /carbon-lab\.html$/i.test(normalizeHref(a)));
+    if (labAnchors.length === 0){
+      const link = document.createElement("a");
+      link.className = "lab-link";
+      link.href = "carbon-lab.html";
+      link.innerHTML = "<span>Carbon Lab ✨</span>";
+      const afterCarbon = anchors.find(a => /carbon\s*program/i.test(a.textContent || ""));
+      if (afterCarbon && afterCarbon.parentNode) afterCarbon.insertAdjacentElement("afterend", link);
+      else nav.insertAdjacentElement("afterbegin", link);
     } else {
-      // Otherwise put it near the front
-      nav.insertAdjacentElement("afterbegin", link);
+      // Keep the first; remove the rest
+      for (let i=1;i<labAnchors.length;i++) labAnchors[i].remove();
+      // Normalize the first
+      const first = labAnchors[0];
+      first.classList.add("lab-link");
+      if (!/carbon\s*lab/i.test(first.textContent || "")) first.innerHTML = "<span>Carbon Lab ✨</span>";
+      if (!/carbon-lab\.html$/i.test(normalizeHref(first))) first.setAttribute("href", "carbon-lab.html");
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", addLink);
-  } else {
-    addLink();
-  }
-})();
+  function init(){
+    ensureSingleLabLink();
 
-/* === Off-canvas mobile menu (robust, idempotent) === */
-(function(){
-  if (window.__ghsOffcanvasInit) return;
-  window.__ghsOffcanvasInit = true;
-
-  const btn = document.getElementById('menu-toggle');
-  const src = document.getElementById('main-menu') || document.querySelector('.menu');
-  if (!btn || !src) return;
-
-  // Styles
-  if (!document.getElementById('ghs-offcanvas-style')) {
-    const s = document.createElement('style'); s.id='ghs-offcanvas-style';
-    s.textContent = `
+    // Off-canvas mobile drawer (clone from header, with dedupe-by-href)
+    if (!window.__ghsOffcanvasInit){
+      window.__ghsOffcanvasInit = true;
+      const btn = document.getElementById("menu-toggle");
+      const src = document.getElementById("main-menu") || document.querySelector(".menu");
+      if (btn && src){
+        if (!document.getElementById("ghs-offcanvas-style")){
+          const s = document.createElement("style"); s.id = "ghs-offcanvas-style";
+          s.textContent = `
 #ghs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s;z-index:2990}
 #ghs-overlay.open{opacity:1;pointer-events:auto}
 #ghs-offcanvas{position:fixed;top:0;left:0;bottom:0;width:min(82vw,380px);transform:translateX(-110%);transition:transform .22s ease;z-index:3000;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:16px 12px;overflow:auto}
@@ -273,137 +277,55 @@ document.addEventListener("DOMContentLoaded", () => {
 #ghs-offcanvas .ghs-menu a{display:block;padding:12px 10px;border-radius:10px;font-weight:700;text-decoration:none;color:#0b4b3f}
 #ghs-offcanvas .ghs-menu a:hover{background:#f0fffb}
 @media (min-width:900px){#ghs-overlay{display:none}#ghs-offcanvas{display:none}}
-    `;
-    document.head.appendChild(s);
-  }
+          `;
+          document.head.appendChild(s);
+        }
+        let overlay = document.getElementById("ghs-overlay");
+        if (!overlay){ overlay = document.createElement("div"); overlay.id="ghs-overlay"; document.body.appendChild(overlay); }
+        let panel = document.getElementById("ghs-offcanvas");
+        if (!panel){
+          panel = document.createElement("aside");
+          panel.id="ghs-offcanvas"; panel.setAttribute("role","dialog"); panel.setAttribute("aria-modal","true");
+          panel.innerHTML = `<nav class="ghs-menu" aria-label="Mobile"></nav>`;
+          document.body.appendChild(panel);
+        }
+        const menu = panel.querySelector(".ghs-menu");
+        function rebuild(){
+          menu.innerHTML = "";
+          const seen = new Set();
+          src.querySelectorAll("a").forEach(a=>{
+            const href = normalizeHref(a);
+            if (!href || seen.has(href)) return;
+            seen.add(href);
+            const c = a.cloneNode(true);
+            c.removeAttribute("id");
+            c.addEventListener("click", () => {
+              overlay.classList.remove("open");
+              panel.classList.remove("open");
+              document.body.style.overflow="";
+            });
+            menu.appendChild(c);
+          });
+        }
+        function open(){ rebuild(); panel.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow="hidden"; }
+        function close(){ panel.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow=""; }
+        function toggle(){ panel.classList.contains("open") ? close() : open(); }
+        btn.addEventListener("click", toggle);
+        overlay.addEventListener("click", close);
+        document.addEventListener("keydown", e=>{ if(e.key==="Escape") close(); });
 
-  // DOM: overlay + panel
-  let overlay = document.getElementById('ghs-overlay');
-  if (!overlay){ overlay = document.createElement('div'); overlay.id='ghs-overlay'; document.body.appendChild(overlay); }
-  let panel = document.getElementById('ghs-offcanvas');
-  if (!panel){
-    panel = document.createElement('aside');
-    panel.id='ghs-offcanvas'; panel.setAttribute('role','dialog'); panel.setAttribute('aria-modal','true');
-    panel.innerHTML = `<nav class="ghs-menu" aria-label="Mobile"></nav>`;
-    document.body.appendChild(panel);
-  }
-  const menu = panel.querySelector('.ghs-menu');
+        // Observe header changes (e.g., if nav is modified later)
+        new MutationObserver(()=>{ ensureSingleLabLink(); rebuild(); }).observe(src, {childList:true, subtree:true});
 
-  function rebuild(){
-    menu.innerHTML = '';
-    src.querySelectorAll('a').forEach(a=>{
-      const c = a.cloneNode(true);
-      c.removeAttribute('id');      // avoid duplicate ids
-      c.addEventListener('click', close);
-      menu.appendChild(c);
-    });
-  }
-  rebuild();
-
-  function open(){
-    rebuild();
-    panel.classList.add('open');
-    overlay.classList.add('open');
-    btn.setAttribute('aria-expanded','true');
-    document.body.style.overflow='hidden';
-  }
-  function close(){
-    panel.classList.remove('open');
-    overlay.classList.remove('open');
-    btn.setAttribute('aria-expanded','false');
-    document.body.style.overflow='';
-  }
-  function toggle(){ panel.classList.contains('open') ? close() : open(); }
-
-  btn.addEventListener('click', toggle);
-  overlay.addEventListener('click', close);
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
-
-  // Keep in sync with any links injected later (e.g., Carbon Lab)
-  new MutationObserver(()=>rebuild()).observe(src, {childList:true, subtree:true});
-})();
-
-/* === Off-canvas menu: dedupe links (prevents double Carbon Lab) === */
-(function(){
-  const panel = document.getElementById('ghs-offcanvas');
-  const src = document.getElementById('main-menu') || document.querySelector('.menu');
-  if (!panel || !src) return;
-  const menu = panel.querySelector('.ghs-menu');
-
-  function rebuild(){
-    if (!menu) return;
-    const seen = new Set();             // track hrefs we've added
-    menu.innerHTML = '';
-    src.querySelectorAll('a').forEach(a=>{
-      const href = (a.getAttribute('href')||'').replace(/#.*$/,'');
-      if (!href || seen.has(href)) return;    // skip duplicates
-      seen.add(href);
-      const c = a.cloneNode(true);
-      c.removeAttribute('id');                // avoid duplicate IDs
-      c.addEventListener('click', () => {
-        document.getElementById('ghs-overlay')?.classList.remove('open');
-        panel.classList.remove('open');
-        document.body.style.overflow='';
-      });
-      menu.appendChild(c);
-    });
-  }
-
-  // expose to the existing off-canvas script if present
-  window.__ghsRebuildOffcanvas = rebuild;
-
-  // run once now
-  rebuild();
-
-  // if your off-canvas initializer had a MutationObserver, keep it:
-  // it will call rebuild() again via window.__ghsRebuildOffcanvas if needed
-})();
-
-
-/* === Ensure a single "Carbon Lab" link in the header (desktop & after mutations) === */
-(function(){
-  function ensureSingleLabLink(){
-    const nav = document.getElementById('main-menu') || document.querySelector('.menu');
-    if (!nav) return;
-
-    // Find all existing Carbon Lab links
-    const links = nav.querySelectorAll('a[href$="carbon-lab.html"]');
-
-    if (links.length === 0) {
-      // Insert once if missing
-      const link = document.createElement('a');
-      link.className = 'lab-link';
-      link.href = 'carbon-lab.html';
-      link.innerHTML = '<span>Carbon Lab ✨</span>';
-      const afterCarbon = Array.from(nav.querySelectorAll('a')).find(a => /carbon\s*program/i.test(a.textContent || ''));
-      if (afterCarbon && afterCarbon.parentNode) {
-        afterCarbon.insertAdjacentElement('afterend', link);
-      } else {
-        nav.insertAdjacentElement('afterbegin', link);
+        // Expose (optional)
+        window.__ghsRebuildOffcanvas = rebuild;
       }
-    } else {
-      // Keep the first; remove the rest
-      for (let i = 1; i < links.length; i++) links[i].remove();
-      // Normalize the first one’s look/label
-      const first = links[0];
-      first.classList.add('lab-link');
-      if (!/carbon\s*lab/i.test(first.textContent)) first.innerHTML = '<span>Carbon Lab ✨</span>';
     }
   }
 
-  // Run now, after DOM, and when nav changes
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', ensureSingleLabLink);
-  } else {
-    ensureSingleLabLink();
-  }
-  setTimeout(ensureSingleLabLink, 500); // catch late injections
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
 
-  const nav = document.getElementById('main-menu') || document.querySelector('.menu');
-  if (nav) new MutationObserver(ensureSingleLabLink).observe(nav, {childList:true, subtree:true});
-
-  // Refresh the off-canvas panel if present
-  if (window.__ghsRebuildOffcanvas) window.__ghsRebuildOffcanvas();
+  // Safety: run once more after late injections
+  setTimeout(init, 500);
 })();
-
-
