@@ -105,7 +105,7 @@ function renderProducts(target = "#product-grid") {
     const div = document.createElement("div");
     div.className = "product";
     div.innerHTML = `
-      <img src="${p.img}" alt="${p.name}" />
+      <img src="${p.img}" alt="${p.name}" loading="lazy" width="800" height="600"/>
       <div class="p-body">
         <div class="tag">${p.vendor}</div>
         <h4>${p.name}</h4>
