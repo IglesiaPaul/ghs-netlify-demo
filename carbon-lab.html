@@ -19,6 +19,7 @@
         <a href="services.html">Services</a>
         <a href="knowledge.html">Knowledge</a>
         <a href="carbon.html">Carbon Program</a>
+        <a class="lab-link" href="carbon-lab.html"><span>Carbon Lab ✨</span></a>
         <a href="token.html">Token Ecosystem</a>
         <a href="partner.html">Partner with Us</a>
         <a href="about.html">About</a>
@@ -44,6 +45,7 @@
       <section class="card">
         <h2>Swap Cauldron</h2>
         <div id="cauldron" class="cauldron" aria-label="Swap target zone">
+          <div class="bubbles" aria-hidden="true"></div>
           <div class="inner">
             <div class="cta">Drop items here ✨ (or tap Add)</div>
             <div id="result" class="small" style="margin-top:8px"></div>
@@ -88,8 +90,15 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="assets/js/app.js?v=2025-08-11-2" defer></script>
-  <script src="assets/js/carbon.lab.js?v=2025-08-11-2" defer></script>
+  <!-- Sticky CTA (visible on very small screens) -->
+  <div class="sticky-cta" id="sticky-cta">
+    <div><div class="k">CO₂e saved</div><div class="v" id="sticky-co2">0.0 kg</div></div>
+    <div><div class="k">Water saved</div><div class="v" id="sticky-h2o">0 L</div></div>
+    <button class="btn" id="sticky-add" aria-label="Add session WETAS to wallet">Add to wallet</button>
+  </div>
+
+  <script src="assets/js/app.js?v=2025-08-11-3" defer></script>
+  <script src="assets/js/carbon.lab.js?v=2025-08-11-3" defer></script>
   <script>
     document.addEventListener("DOMContentLoaded", ()=>{ try{ setupMobileMenu && setupMobileMenu(); }catch(e){} });
     try{ const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; const el = document.getElementById("geo-badge"); if(el) el.textContent = tz; }catch(e){}
