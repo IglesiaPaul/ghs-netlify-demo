@@ -1,0 +1,30 @@
+/* === Single Product View (playful/gamey) === */
+.product-hero{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.product-gallery{position:relative; background:linear-gradient(180deg,#f9fbff,#f6fff9); border:1px solid #eef2ef; border-radius:18px; padding:12px; box-shadow:0 16px 40px rgba(0,0,0,.06);}
+.product-gallery img{width:100%; height:auto; border-radius:12px; display:block}
+.product-info{display:grid;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:12px; background:#f4fffc; border:1px solid #d9f8ef; color:#0b4b3f; padding:6px 10px; border-radius:999px}
+.price-lg{font-size:28px;font-weight:800}
+.actions-row{display:flex; gap:8px; flex-wrap:wrap}
+
+.card-neo{position:relative; background:#0d1b16; color:#c8fff0; border-radius:16px; padding:16px; overflow:hidden; border:1px solid #143d31; box-shadow: inset 0 0 0 1px rgba(56,226,181,.15), 0 12px 40px rgba(12,48,38,.35)}
+.card-neo::before{content:""; position:absolute; inset:-2px; background:conic-gradient(from 180deg, rgba(56,226,181,.25), transparent 40%, rgba(56,226,181,.25) 60%, transparent 100%); filter: blur(18px); opacity:.5; z-index:0}
+.card-neo .row{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.card-neo .id{font-family: ui-monospace, Menlo, Consolas, monospace; font-size:12px; opacity:.8}
+.badge-verify{background:#1a6f56; color:#c8fff0; border:1px solid #3de7c4; padding:4px 8px; border-radius:999px; font-size:12px}
+.kpi{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px}
+.kpi .box{background:#0f2320; border:1px solid #124b40; border-radius:12px; padding:10px}
+.kpi .label{font-size:12px; opacity:.8}
+.kpi .value{font-size:18px; font-weight:800}
+
+.xp{margin-top:10px}
+.xp .bar{height:10px; background:#0f2320; border:1px solid #124b40; border-radius:999px; overflow:hidden}
+.xp .fill{height:100%; width:0%; background:linear-gradient(90deg, #38E2B5, #8cf5db); transition: width .8s ease}
+
+@media (max-width: 900px){
+  .product-hero{grid-template-columns:1fr}
+}
+
+/* tilt on hover for gallery */
+.tilt{transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); transition: transform .12s ease}
