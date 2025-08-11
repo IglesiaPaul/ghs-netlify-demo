@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Partner With Us — Global Hemp Service</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+  
+<header>
+  <div class="nav">
+    <div class="logo"><span class="logo-badge"></span> Global Hemp Service <span class="badge" id="geo-badge"></span></div>
+    <nav class="menu"><a href="index.html">Home</a><a href="marketplace.html">Marketplace</a><a href="services.html">Services</a><a href="knowledge.html">Knowledge</a><a href="carbon.html">Carbon Program</a><a href="token.html">Token Ecosystem</a><a href="partner.html" style="background: rgba(56,226,181,.12)">Partner with Us</a><a href="about.html">About</a><a href="contact.html">Contact</a><a href="wallet.html">Wallet</a></nav>
+    <div class="actions">
+      <a href="cart.html" class="btn ghost">Cart <span class="badge" id="cart-badge">0</span></a>
+    </div>
+  </div>
+</header>
+<script>
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const el = document.getElementById("geo-badge");
+    if(el) el.textContent = tz;
+  } catch(e) {}
+</script>
+
+  
+<div class="container">
+  <h1>Partner With Us</h1>
+  <p>Suppliers, NGOs, and tech partners — let's build a greener value chain.</p>
+  <div class="card">
+    <b>Vendor Toolkit (demo)</b>
+    <ul>
+      <li>Storefront branding guide</li>
+      <li>Onboarding checklist</li>
+      <li>Data & impact reporting</li>
+    </ul>
+  </div>
+</div>
+
+  
+<footer>
+  <div class="container small">
+    <div>© 2025 Global Hemp Service — Demo. | <a href="privacy.html">Privacy</a> | <a href="terms.html">Terms</a> | <a href="cookies.html">Cookies</a></div>
+  </div>
+</footer>
+<script src="assets/js/app.js"></script>
+
+</body>
+</html>
