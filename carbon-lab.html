@@ -33,7 +33,7 @@
     </div>
   </header>
 
-  <main class="container">
+  <main class="container lab-page">
     <div class="lab-hero">
       <section class="card">
         <h2>Hemp Swap Lab</h2>
@@ -88,17 +88,17 @@
     <div class="container small">© 2025 Global Hemp Service — Demo.</div>
   </footer>
 
-  <div class="toast" id="toast"></div>
+  <div class="toast lab-page" id="toast"></div>
 
   <!-- Sticky CTA (visible on very small screens) -->
-  <div class="sticky-cta" id="sticky-cta">
+  <div class="sticky-cta lab-page" id="sticky-cta">
     <div><div class="k">CO₂e saved</div><div class="v" id="sticky-co2">0.0 kg</div></div>
     <div><div class="k">Water saved</div><div class="v" id="sticky-h2o">0 L</div></div>
     <button class="btn" id="sticky-add" aria-label="Add session WETAS to wallet">Add to wallet</button>
   </div>
 
-  <script src="assets/js/app.js?v=2025-08-11-3" defer></script>
-  <script src="assets/js/carbon.lab.js?v=2025-08-11-3" defer></script>
+  <script src="assets/js/app.js?v=2025-08-11-4" defer></script>
+  <script src="assets/js/carbon.lab.js?v=2025-08-11-4" defer></script>
   <script>
     document.addEventListener("DOMContentLoaded", ()=>{ try{ setupMobileMenu && setupMobileMenu(); }catch(e){} });
     try{ const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; const el = document.getElementById("geo-badge"); if(el) el.textContent = tz; }catch(e){}
