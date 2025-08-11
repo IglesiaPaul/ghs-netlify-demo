@@ -360,3 +360,50 @@ document.addEventListener("DOMContentLoaded", () => {
 })();
 
 
+/* === Ensure a single "Carbon Lab" link in the header (desktop & after mutations) === */
+(function(){
+  function ensureSingleLabLink(){
+    const nav = document.getElementById('main-menu') || document.querySelector('.menu');
+    if (!nav) return;
+
+    // Find all existing Carbon Lab links
+    const links = nav.querySelectorAll('a[href$="carbon-lab.html"]');
+
+    if (links.length === 0) {
+      // Insert once if missing
+      const link = document.createElement('a');
+      link.className = 'lab-link';
+      link.href = 'carbon-lab.html';
+      link.innerHTML = '<span>Carbon Lab ✨</span>';
+      const afterCarbon = Array.from(nav.querySelectorAll('a')).find(a => /carbon\s*program/i.test(a.textContent || ''));
+      if (afterCarbon && afterCarbon.parentNode) {
+        afterCarbon.insertAdjacentElement('afterend', link);
+      } else {
+        nav.insertAdjacentElement('afterbegin', link);
+      }
+    } else {
+      // Keep the first; remove the rest
+      for (let i = 1; i < links.length; i++) links[i].remove();
+      // Normalize the first one’s look/label
+      const first = links[0];
+      first.classList.add('lab-link');
+      if (!/carbon\s*lab/i.test(first.textContent)) first.innerHTML = '<span>Carbon Lab ✨</span>';
+    }
+  }
+
+  // Run now, after DOM, and when nav changes
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ensureSingleLabLink);
+  } else {
+    ensureSingleLabLink();
+  }
+  setTimeout(ensureSingleLabLink, 500); // catch late injections
+
+  const nav = document.getElementById('main-menu') || document.querySelector('.menu');
+  if (nav) new MutationObserver(ensureSingleLabLink).observe(nav, {childList:true, subtree:true});
+
+  // Refresh the off-canvas panel if present
+  if (window.__ghsRebuildOffcanvas) window.__ghsRebuildOffcanvas();
+})();
+
+
