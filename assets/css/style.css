@@ -131,3 +131,27 @@ header {
   background: var(--primary); color:#003a2e; font-weight:800; font-size:18px;
   display:flex; align-items:center; justify-content:center; cursor:pointer; z-index: 1100;
 }
+/* --- Accessibility: higher-contrast mobile menu links --- */
+:root{
+  /* optional: keeps naming tidy if you tweak later */
+  --nav-text: #0b4b3f;          /* 10:1 vs white */
+  --nav-hover-bg: #e6f7f2;      /* subtle hover, still 9:1 text contrast */
+}
+
+/* Desktop & mobile menu links use dark text (overrides generic a{color: var(--primary)}) */
+.menu a,
+#main-menu.menu-panel a{
+  color: var(--nav-text);
+}
+
+/* Hover state stays high-contrast */
+#main-menu.menu-panel a:hover{
+  background: var(--nav-hover-bg);
+}
+
+/* Keyboard focus ring for accessibility */
+.menu a:focus-visible,
+#main-menu.menu-panel a:focus-visible{
+  outline: 2px solid #0b7c3f;
+  outline-offset: 2px;
+}
