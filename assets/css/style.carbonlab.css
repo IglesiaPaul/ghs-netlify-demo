@@ -1,80 +1,73 @@
-/* === Hemp Swap Lab (mobile + flair) === */
-.lab-hero{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-@media (max-width: 900px){ .lab-hero{grid-template-columns:1fr} }
+/* === Hemp Swap Lab (scoped to .lab-page to avoid header/cart clashes) === */
+.lab-page .lab-hero{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media (max-width: 900px){ .lab-page .lab-hero{grid-template-columns:1fr} }
 
-.card{border:1px solid #eef2ef; background:#fff; border-radius:16px; padding:16px; box-shadow:0 12px 32px rgba(0,0,0,.06)}
-.card h2{margin:0 0 8px 0}
-.small{font-size:12px; opacity:.85}
-.grid{display:grid; gap:12px}
-.grid.cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
-.grid.cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
-@media (max-width: 900px){ .grid.cols-3{grid-template-columns:repeat(2, minmax(0,1fr))} }
-@media (max-width: 520px){ .grid.cols-3{grid-template-columns:1fr} }
+.lab-page .card{border:1px solid #eef2ef; background:#fff; border-radius:16px; padding:16px; box-shadow:0 12px 32px rgba(0,0,0,.06)}
+.lab-page .card h2{margin:0 0 8px 0}
+.lab-page .small{font-size:12px; opacity:.85}
+.lab-page .grid{display:grid; gap:12px}
+.lab-page .grid.cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.lab-page .grid.cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
+@media (max-width: 900px){ .lab-page .grid.cols-3{grid-template-columns:repeat(2, minmax(0,1fr))} }
+@media (max-width: 520px){ .lab-page .grid.cols-3{grid-template-columns:1fr} }
 
-.inv-card{border:1px dashed #e3f7f1; border-radius:14px; padding:10px; background:linear-gradient(180deg,#f9fffc,#f7fbff); cursor:grab; display:grid; gap:8px}
-.inv-card:active{cursor:grabbing}
-.inv-card .t{font-weight:700}
-.inv-card .s{font-size:12px; opacity:.8}
-.inv-card .img{height:120px; display:grid; place-items:center; border-radius:10px; background:#f0fffb; overflow:hidden}
-@media (max-width:520px){ .inv-card .img{height:160px} }
-.inv-card img{width:100%; height:100%; object-fit:cover; display:block}
-.inv-card .btn-row{display:flex; gap:8px; flex-wrap:wrap}
-.inv-card .btn-sm{padding:8px 10px; border-radius:10px; border:1px solid #d9f8ef; background:#38E2B5; color:#003a2e; font-weight:700; cursor:pointer}
-.inv-card .btn-sm.ghost{background:#fff; color:#0b7c3f}
+.lab-page .inv-card{border:1px dashed #e3f7f1; border-radius:14px; padding:10px; background:linear-gradient(180deg,#f9fffc,#f7fbff); cursor:grab; display:grid; gap:8px}
+.lab-page .inv-card:active{cursor:grabbing}
+.lab-page .inv-card .t{font-weight:700}
+.lab-page .inv-card .s{font-size:12px; opacity:.8}
+.lab-page .inv-card .img{height:120px; display:grid; place-items:center; border-radius:10px; background:#f0fffb; overflow:hidden}
+@media (max-width:520px){ .lab-page .inv-card .img{height:160px} }
+.lab-page .inv-card img{width:100%; height:100%; object-fit:cover; display:block}
+.lab-page .inv-card .btn-row{display:flex; gap:8px; flex-wrap:wrap}
+.lab-page .inv-card .btn-sm{padding:8px 10px; border-radius:10px; border:1px solid #d9f8ef; background:#38E2B5; color:#003a2e; font-weight:700; cursor:pointer}
+.lab-page .inv-card .btn-sm.ghost{background:#fff; color:#0b7c3f}
 
-.cauldron{position:relative; border:2px dashed #bfeee2; border-radius:20px; min-height:260px; background:repeating-linear-gradient(135deg, rgba(56,226,181,.06) 0 12px, rgba(0,0,0,0) 12px 24px); overflow:hidden}
-.cauldron.drop{border-color:#38E2B5; box-shadow:0 0 0 4px rgba(56,226,181,.15) inset}
-.cauldron .inner{padding:16px; position:relative; z-index:1}
-.cauldron .cta{opacity:.8; text-align:center; padding:16px; font-size:14px}
+.lab-page .cauldron{position:relative; border:2px dashed #bfeee2; border-radius:20px; min-height:260px; background:repeating-linear-gradient(135deg, rgba(56,226,181,.06) 0 12px, rgba(0,0,0,0) 12px 24px); overflow:hidden}
+.lab-page .cauldron.drop{border-color:#38E2B5; box-shadow:0 0 0 4px rgba(56,226,181,.15) inset}
+.lab-page .cauldron .inner{padding:16px; position:relative; z-index:1}
+.lab-page .cauldron .cta{opacity:.8; text-align:center; padding:16px; font-size:14px}
 /* Bubbling layer */
-.bubbles{position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:0}
-.bubble{position:absolute; bottom:-24px; width:10px; height:10px; background:radial-gradient(circle at 30% 30%, #d8fff5, #8cf5db 70%, rgba(0,0,0,0) 72%); border-radius:50%; opacity:.8; filter:blur(.2px)}
+.lab-page .bubbles{position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:0}
+.lab-page .bubble{position:absolute; bottom:-24px; width:10px; height:10px; background:radial-gradient(circle at 30% 30%, #d8fff5, #8cf5db 70%, rgba(0,0,0,0) 72%); border-radius:50%; opacity:.8; filter:blur(.2px)}
 @keyframes rise { 0%{ transform:translateY(0) scale(.8); opacity:.0 } 10%{opacity:.9} 90%{opacity:.9} 100%{ transform:translateY(-120%) scale(1.1); opacity:0 } }
 @media (prefers-reduced-motion: reduce){
-  .bubble{ animation:none !important }
-  .menu .lab-link::before{ animation:none !important }
+  .lab-page .bubble{ animation:none !important }
+  .menu a.lab-link::before{ animation:none !important }
 }
 
 /* KPI grid responsiveness */
-.kpis{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
-@media (max-width:720px){ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
-@media (max-width:420px){ .kpis{grid-template-columns:1fr} }
-.kpi{background:#0d1b16; color:#c8fff0; border-radius:12px; padding:12px; border:1px solid #143d31; box-shadow: inset 0 0 0 1px rgba(56,226,181,.15)}
-.kpi .label{font-size:12px; opacity:.85}
-.kpi .value{font-size:20px; font-weight:800}
+.lab-page .kpis{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+@media (max-width:720px){ .lab-page .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:420px){ .lab-page .kpis{grid-template-columns:1fr} }
+.lab-page .kpi{background:#0d1b16; color:#c8fff0; border-radius:12px; padding:12px; border:1px solid #143d31; box-shadow: inset 0 0 0 1px rgba(56,226,181,.15)}
+.lab-page .kpi .label{font-size:12px; opacity:.85}
+.lab-page .kpi .value{font-size:20px; font-weight:800}
 
-.badges{display:flex; gap:8px; flex-wrap:wrap}
-.badge{background:#eafff6; border:1px solid #b7f2e0; padding:6px 10px; border-radius:999px; font-size:13px}
-.badge:active{transform:scale(.98)}
+.lab-page .badges{display:flex; gap:8px; flex-wrap:wrap}
+.lab-page .badge{background:#eafff6; border:1px solid #b7f2e0; padding:6px 10px; border-radius:999px; font-size:13px}
+.lab-page .badge:active{transform:scale(.98)}
 
-.actions-row{display:flex; gap:8px; flex-wrap:wrap}
-.btn{cursor:pointer; padding:10px 14px; border-radius:12px; border:1px solid #d9f8ef; background:#38E2B5; color:#003a2e; font-weight:700}
-.btn.ghost{background:#fff; color:#0b7c3f}
+.lab-page .actions-row{display:flex; gap:8px; flex-wrap:wrap}
+.lab-page .btn{cursor:pointer; padding:10px 14px; border-radius:12px; border:1px solid #d9f8ef; background:#38E2B5; color:#003a2e; font-weight:700}
+.lab-page .btn.ghost{background:#fff; color:#0b7c3f}
 
 /* Sticky CTA on very small screens */
-.sticky-cta{position:fixed; left:0; right:0; bottom:0; display:none; align-items:center; gap:10px; padding:10px 14px; background:#0d1b16; color:#c8fff0; border-top:1px solid #143d31; z-index:2500}
-.sticky-cta .k{font-size:12px; opacity:.8}
-.sticky-cta .v{font-weight:800}
-.sticky-cta .btn{margin-left:auto}
-@media (max-width:560px){ .sticky-cta{display:flex} }
+.lab-page .sticky-cta{position:fixed; left:0; right:0; bottom:0; display:none; align-items:center; gap:10px; padding:10px 14px; background:#0d1b16; color:#c8fff0; border-top:1px solid #143d31; z-index:2500}
+.lab-page .sticky-cta .k{font-size:12px; opacity:.8}
+.lab-page .sticky-cta .v{font-weight:800}
+.lab-page .sticky-cta .btn{margin-left:auto}
+@media (max-width:560px){ .lab-page .sticky-cta{display:flex} }
 
-.assump{margin-top:10px}
-.assump table{width:100%; border-collapse:collapse}
-.assump th,.assump td{border-bottom:1px solid #eef2ef; padding:8px; text-align:left; font-size:13px}
+.lab-page .assump{margin-top:10px}
+.lab-page .assump table{width:100%; border-collapse:collapse}
+.lab-page .assump th,.lab-page .assump td{border-bottom:1px solid #eef2ef; padding:8px; text-align:left; font-size:13px}
 
-.toast{position:fixed; right:16px; bottom:76px; background:#0d1b16; color:#c8fff0; border:1px solid #143d31; border-radius:12px; padding:10px 14px; z-index:3000; display:none}
-.toast.show{display:block}
+/* Toast sits above sticky bar */
+.lab-page .toast{position:fixed; right:16px; bottom:76px; background:#0d1b16; color:#c8fff0; border:1px solid #143d31; border-radius:12px; padding:10px 14px; z-index:3000; display:none}
+.lab-page .toast.show{display:block}
 
-/* Nav highlight: twist background for Carbon Lab link */
+/* Nav highlight: twist background for Carbon Lab link (kept global, safe) */
 .menu a.lab-link{position:relative; display:inline-block; border-radius:999px; padding:6px 10px; font-weight:700; overflow:hidden; border:1px solid #d9f8ef}
 .menu a.lab-link::before{content:""; position:absolute; inset:-30%; background:conic-gradient(from 0deg, rgba(56,226,181,.4), transparent 40%, rgba(56,226,181,.35) 60%, transparent 100%); animation:twist 4.8s linear infinite; z-index:0; filter:blur(10px)}
 .menu a.lab-link span{position:relative; z-index:1}
 @keyframes twist{ to { transform:rotate(360deg);} }
-
-.logo-badge{display:inline-block; width:10px; height:10px; background:#38E2B5; border-radius:2px; margin-right:6px}
-.hamburger{background:transparent; border:1px solid #e0f4ed; border-radius:10px; width:40px; height:40px}
-.hamburger span{display:block; width:18px; height:2px; background:#0b4b3f; margin:0 auto; position:relative; top:19px}
-.menu-panel{position:fixed; inset:0 40% 0 0; transform:translateX(-110%); transition:transform .2s ease; background:#fff; padding:16px; z-index:2000}
-.menu-panel.open{transform:translateX(0)}
-#menu-overlay{position:fixed; inset:0; background:rgba(0,0,0,.2); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:1500}
-#menu-overlay.open{opacity:1; pointer-events:auto}
