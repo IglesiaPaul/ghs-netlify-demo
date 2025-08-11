@@ -6,7 +6,32 @@
   <title>Product — Global Hemp Service</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" href="assets/css/style.css"/>
-  <link rel="stylesheet" href="assets/css/style.single-product.patch.css"/>
+  <style>
+    /* Single Product (compact + playful) */
+    .product-hero{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+    .product-gallery{position:relative;background:linear-gradient(180deg,#f9fbff,#f6fff9);border:1px solid #eef2ef;border-radius:18px;padding:12px;box-shadow:0 16px 40px rgba(0,0,0,.06)}
+    .product-gallery img{width:100%;height:auto;border-radius:12px;display:block}
+    .product-info{display:grid;gap:12px}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{font-size:12px;background:#f4fffc;border:1px solid #d9f8ef;color:#0b4b3f;padding:6px 10px;border-radius:999px}
+    .price-lg{font-size:28px;font-weight:800}
+    .actions-row{display:flex;gap:8px;flex-wrap:wrap}
+
+    .card-neo{position:relative;background:#0d1b16;color:#c8fff0;border-radius:16px;padding:16px;overflow:hidden;border:1px solid #143d31;box-shadow:inset 0 0 0 1px rgba(56,226,181,.15),0 12px 40px rgba(12,48,38,.35)}
+    .card-neo::before{content:"";position:absolute;inset:-2px;background:conic-gradient(from 180deg, rgba(56,226,181,.25), transparent 40%, rgba(56,226,181,.25) 60%, transparent 100%);filter:blur(18px);opacity:.5;z-index:0}
+    .card-neo .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .card-neo .id{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;opacity:.8}
+    .badge-verify{background:#1a6f56;color:#c8fff0;border:1px solid #3de7c4;padding:4px 8px;border-radius:999px;font-size:12px}
+    .kpi{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    .kpi .box{background:#0f2320;border:1px solid #124b40;border-radius:12px;padding:10px}
+    .kpi .label{font-size:12px;opacity:.8}
+    .kpi .value{font-size:18px;font-weight:800}
+    .xp{margin-top:10px}
+    .xp .bar{height:10px;background:#0f2320;border:1px solid #124b40;border-radius:999px;overflow:hidden}
+    .xp .fill{height:100%;width:0%;background:linear-gradient(90deg,#38E2B5,#8cf5db);transition:width .8s ease}
+    .tilt{transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .12s ease}
+    @media (max-width:900px){.product-hero{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
   <header>
@@ -32,22 +57,124 @@
     </div>
   </header>
 
-  <div class="container">
-    <div id="product-root"></div>
-  </div>
+  <div class="container"><div id="product-root"></div></div>
 
-  <footer>
-    <div class="container small">
-      <div>© 2025 Global Hemp Service — Demo.</div>
-    </div>
-  </footer>
+  <footer><div class="container small">© 2025 Global Hemp Service — Demo.</div></footer>
 
-  <script src="assets/js/app.js?v=2025-08-11-5"></script>
-  <script src="assets/js/app.single-product.patch.js?v=2025-08-11-5"></script>
+  <!-- Load your main app.js first -->
+  <script src="assets/js/app.js?v=2025-08-11-7" defer></script>
+
+  <!-- Inline product-page logic (self-contained) -->
   <script>
-    document.addEventListener("DOMContentLoaded", ()=>{ try{ renderProductDetail(); }catch(e){ console.error(e); } });
-    document.addEventListener("DOMContentLoaded", ()=>{ try{ setupMobileMenu&&setupMobileMenu(); }catch(e){} });
-    try{ const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; const el = document.getElementById("geo-badge"); if(el) el.textContent = tz; }catch(e){}
+  const CatalogDetails = [
+    {id:1,slug:"hemp-blend-tee",name:"Hemp Blend Tee",vendor:"GreenWeave",vendorSlug:"greenweave",category:"Apparel",price:29,img:"assets/img/products/apparel-tee.png",desc:"Soft, breathable hemp-cotton blend tee with minimal water footprint. Pre-washed for comfort.",origin:"Portugal",sku:"GW-TEE-HEMP-001",co2e:{production:2.3,transport:0.4},provenance:"Verified supply chain (EU mills)",specs:{Material:"60% Hemp / 40% Cotton",Weight:"180 gsm",Fit:"Regular",Care:"Machine wash cold"}},
+    {id:2,slug:"hemp-protein-powder",name:"Hemp Protein Powder",vendor:"NutriHemp",vendorSlug:"nutrihemp",category:"Food",price:19,img:"assets/img/products/protein-powder.png",desc:"Cold-pressed hemp protein with complete amino acid profile. Naturally nutty, no additives.",origin:"Netherlands",sku:"NH-PROT-500",co2e:{production:1.1,transport:0.6},provenance:"Farm-to-jar traceability",specs:{Weight:"500g",Protein:"50%",Allergens:"None",Storage:"Cool & dry"}},
+    {id:3,slug:"hempcrete-brick",name:"Hempcrete Brick",vendor:"EcoBuild Co.",vendorSlug:"ecobuild",category:"Construction",price:8,img:"assets/img/products/hempcrete-brick.png",desc:"Structural hempcrete brick with excellent insulation and carbon-storing lime binder.",origin:"France",sku:"EB-HCB-STD",co2e:{production:-0.8,transport:0.7},provenance:"Batch QA with lime binder certs",specs:{Size:"300×150×100 mm",Density:"~110 kg/m³",RValue:"High",Use:"Non-load bearing walls"}},
+    {id:4,slug:"hemp-facial-oil",name:"Hemp Facial Oil",vendor:"Verdant Glow",vendorSlug:"verdantglow",category:"Wellness",price:24,img:"assets/img/products/facial-oil.png",desc:"Lightweight facial oil infused with hemp seed extract for calm, balanced skin.",origin:"Italy",sku:"VG-HEMPOIL-30",co2e:{production:0.6,transport:0.3},provenance:"COSMOS-compliant line",specs:{Volume:"30 ml",Skin:"Sensitive / Combo",Scent:"Herbal",Shelf:"12M PAO"}},
+    {id:5,slug:"hemp-tote-bag",name:"Hemp Tote Bag",vendor:"Loom&Leaf",vendorSlug:"loomleaf",category:"Accessories",price:18,img:"assets/img/products/tote-bag.png",desc:"Durable hemp tote with reinforced seams — built for markets and daily carry.",origin:"India",sku:"LL-TOTE-H01",co2e:{production:0.9,transport:0.8},provenance:"GOTS-aligned dyehouse",specs:{Size:"38×42 cm",Handle:"62 cm drop",Pocket:"Inner slip",Weight:"240 gsm"}},
+    {id:6,slug:"hemp-rope-10m",name:"Hemp Rope 10m",vendor:"Mariner",vendorSlug:"mariner",category:"Industrial",price:12,img:"assets/img/products/rope-coil.png",desc:"Natural fiber rope with high grip and low stretch — classic marine utility length (10m).",origin:"UK",sku:"MR-ROPE-10M",co2e:{production:1.2,transport:0.5},provenance:"Audit-backed sourcing",specs:{Length:"10 m",Diameter:"10 mm",Twist:"3-strand",Use:"General purpose"}}
+  ];
+  const CatalogById = Object.fromEntries(CatalogDetails.map(p => [p.id, p]));
+  const TokenRules = { Apparel:2, Food:3, Construction:8, Wellness:2, Accessories:1, Industrial:5 };
+
+  function q(name, dflt=null){ return new URLSearchParams(location.search).get(name) || dflt; }
+  function tokensFor(p){ return TokenRules[p.category] || 1; }
+  function currency(n){ return new Intl.NumberFormat(undefined, {style:"currency", currency:"EUR"}).format(n); }
+  function animateXP(el,pct){ if(!el) return; requestAnimationFrame(()=>{ el.style.width = Math.max(0,Math.min(100,pct)) + "%"; }); }
+  function tiltHover(container){
+    if(!container) return;
+    container.addEventListener("mousemove", (e)=>{
+      const r=container.getBoundingClientRect(), x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height;
+      container.style.setProperty("--ry", ((x-0.5)*8)+"deg");
+      container.style.setProperty("--rx", ((0.5-y)*6)+"deg");
+    }, {passive:true});
+    container.addEventListener("mouseleave", ()=>{ container.style.setProperty("--ry","0deg"); container.style.setProperty("--rx","0deg"); }, {passive:true});
+  }
+
+  function renderProductDetail(){
+    const id = parseInt(q("id","0"),10);
+    const p = CatalogById[id];
+    const root = document.getElementById("product-root");
+    if(!root) return;
+    if(!p){ root.innerHTML = '<div class="card"><b>Product not found.</b> <a href="marketplace.html">Back to marketplace</a></div>'; return; }
+
+    const tokens = tokensFor(p);
+    const co2eTotal = p.co2e.production + p.co2e.transport;
+
+    root.innerHTML = `
+      <div class="product-hero">
+        <div class="product-gallery tilt" id="gal">
+          <img src="${p.img}" alt="${p.name}" width="1200" height="900" loading="eager" fetchpriority="high"/>
+        </div>
+        <div class="product-info">
+          <div class="chips">
+            <span class="chip">${p.vendor}</span>
+            <span class="chip">${p.category}</span>
+            <span class="chip">SKU: ${p.sku}</span>
+            <span class="chip">Origin: ${p.origin}</span>
+          </div>
+          <h1>${p.name}</h1>
+          <div class="price-lg">${currency(p.price)}</div>
+          <p>${p.desc}</p>
+
+          <div class="card-neo" role="region" aria-label="WETAS ID">
+            <div class="row">
+              <div><b>WETAS ID</b> <span class="id">#${String(p.id).padStart(4,"0")}-${p.vendorSlug}</span></div>
+              <div class="badge-verify">Verified provenance</div>
+            </div>
+            <div class="kpi">
+              <div class="box">
+                <div class="label">Estimated CO₂e (production + transport)</div>
+                <div class="value">${co2eTotal.toFixed(1)} kg</div>
+              </div>
+              <div class="box">
+                <div class="label">WETAS on purchase</div>
+                <div class="value">+${tokens} WETAS</div>
+              </div>
+            </div>
+            <div class="xp">
+              <div class="label">Impact meter</div>
+              <div class="bar"><div class="fill" id="xp-fill"></div></div>
+            </div>
+            <div class="small" style="margin-top:8px;opacity:.85">
+              Provenance: ${p.provenance}. <a href="vendor.html?v=${encodeURIComponent(p.vendorSlug)}">View brand profile →</a>
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button class="btn" id="add-btn">Add to cart</button>
+            <a class="btn ghost" href="wallet.html">Open wallet</a>
+            <a class="btn ghost" href="vendor.html?v=${encodeURIComponent(p.vendorSlug)}">Explore brand</a>
+          </div>
+
+          <div class="card" style="margin-top:8px">
+            <b>Specs</b>
+            <div class="grid cols-3" style="margin-top:8px">
+              ${Object.entries(p.specs).map(([k,v])=>`<div class="small"><b>${k}:</b> ${v}</div>`).join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // UI niceties
+    tiltHover(document.getElementById("gal"));
+    animateXP(document.getElementById("xp-fill"), Math.min(100, Math.max(10, Math.round((tokens/8)*100))));
+
+    // Add to cart (reuses addToCart from app.js if present)
+    const btn = document.getElementById("add-btn");
+    if (btn) btn.addEventListener("click", (e)=> {
+      try { if (typeof addToCart === "function") addToCart(p.id); } catch(_) {}
+      if (navigator.vibrate) try { navigator.vibrate(16); } catch(_){}
+      alert("Added to cart: " + p.name);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    try { renderProductDetail(); } catch(e){ console.error(e); }
+    try { setupMobileMenu && setupMobileMenu(); } catch(e){}
+    try { const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; const el = document.getElementById("geo-badge"); if (el) el.textContent = tz; } catch(e){}
+  });
   </script>
 </body>
 </html>
