@@ -4,25 +4,50 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Thank you — Global Hemp Service</title>
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="noindex">
   <link rel="stylesheet" href="assets/css/style.css"/>
+  <style>
+    .ty-wrap{min-height:70vh; display:grid; place-items:center; text-align:center}
+    .ty-card{border:1px solid #eef2ef; background:#fff; border-radius:16px; padding:24px; box-shadow:0 16px 40px rgba(0,0,0,.06); max-width:720px}
+    .ty-emoji{font-size:42px}
+    .btn-row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px}
+  </style>
 </head>
 <body>
   <header>
-    <div class="nav"><div class="logo"><span class="logo-badge"></span> Global Hemp Service</div></div>
+    <div class="nav">
+      <div class="logo"><span class="logo-badge"></span> Global Hemp Service</div>
+      <nav class="menu">
+        <a href="index.html">Home</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
   </header>
-  <div class="container">
-    <h1>Thank you!</h1>
-    <p>Your message has been received. We’ll get back to you shortly.</p>
-    <p><a class="btn" href="index.html">Back to Home</a></p>
-  </div>
- <footer>
-  <div class="container small">
-    <div>© 2025 Global Hemp Service — Demo. | <a href="privacy.html">Privacy</a> | <a href="terms.html">Terms</a> | <a href="cookies.html">Cookies</a></div>
-  </div>
-</footer>
-<script src="assets/js/app.js?v=2025-08-11-4"></script>
 
+  <main class="container ty-wrap">
+    <div class="ty-card">
+      <div class="ty-emoji">🎉</div>
+      <h1>Thank you!</h1>
+      <p>We received your submission and will get back to you shortly.</p>
+      <div id="extra"></div>
+      <div class="btn-row">
+        <a class="btn" href="/">Return home</a>
+        <a class="btn ghost" href="marketplace.html">Back to marketplace</a>
+      </div>
+    </div>
+  </main>
 
+  <footer>
+    <div class="container small">© 2025 Global Hemp Service — Demo.</div>
+  </footer>
+  <script>
+    // Optional: show which brand the message was for
+    try { 
+      const qp = new URLSearchParams(location.search);
+      const b = qp.get("brand");
+      if (b) document.getElementById("extra").textContent = "Brand: " + b;
+    } catch(e){}
+  </script>
 </body>
 </html>
