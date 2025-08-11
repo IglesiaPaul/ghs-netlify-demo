@@ -430,6 +430,15 @@ document.addEventListener("DOMContentLoaded", () => {
 .hamburger{ display:inline-flex; align-items:center; justify-content:center; }
 
 /* Drawer visuals + highlight pills */
+
+/* Desktop overrides to ensure drawer shows */
+@media (min-width:900px){
+  #ghs-offcanvas{display:block !important}
+  #ghs-overlay{display:block !important}
+}
+/* Clip highlight glows to links */
+#ghs-offcanvas .ghs-menu a{ position:relative; overflow:hidden; }
+
 #menu-overlay{display:none !important}
 
 #ghs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s;z-index:2990}
