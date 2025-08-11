@@ -204,12 +204,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (resetBtn) resetBtn.addEventListener("click", (e) => { e.preventDefault(); resetDemo(); });
 });
 
-/* === Carbon Lab nav: style + single-link guarantee (desktop & mobile) === */
+/* === Carbon Lab nav module (v2): canonicalize + dedupe desktop & mobile === */
 (function(){
-  if (window.__ghsLabLinkInit) return;
-  window.__ghsLabLinkInit = true;
+  if (window.__ghsLabModuleV2) return;
+  window.__ghsLabModuleV2 = true;
 
-  // 1) Inject twist/glow styles once
+  // One-time style for the fancy link
   if (!document.getElementById("lab-link-style")) {
     const style = document.createElement("style");
     style.id = "lab-link-style";
@@ -225,12 +225,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function normalizeHref(a){
     const raw = (typeof a === "string" ? a : (a.getAttribute && a.getAttribute("href")) || "") || "";
-    return raw
+    let p = raw
       .replace(location.origin, "")
       .replace(/^[a-z]+:\/\//i, "")
       .replace(/^\//, "")
       .replace(/\?.*$/, "")
       .replace(/#.*$/, "");
+    // Drop trailing slash
+    if (p.endsWith("/")) p = p.slice(0,-1);
+    // Canonicalize Carbon Lab variants
+    const pl = p.toLowerCase();
+    if (pl === "carbon-lab" || pl === "carbon-lab/index" || pl === "carbon-lab/index.html") p = "carbon-lab.html";
+    return p;
   }
 
   function ensureSingleLabLink(){
@@ -238,7 +244,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!nav) return;
 
     const anchors = Array.from(nav.querySelectorAll("a"));
-    const labAnchors = anchors.filter(a => /carbon-lab\.html$/i.test(normalizeHref(a)));
+    const labAnchors = anchors.filter(a => normalizeHref(a) === "carbon-lab.html");
+
     if (labAnchors.length === 0){
       const link = document.createElement("a");
       link.className = "lab-link";
@@ -248,28 +255,26 @@ document.addEventListener("DOMContentLoaded", () => {
       if (afterCarbon && afterCarbon.parentNode) afterCarbon.insertAdjacentElement("afterend", link);
       else nav.insertAdjacentElement("afterbegin", link);
     } else {
-      // Keep the first; remove the rest
+      // Keep the first; remove the rest, and normalize the first
       for (let i=1;i<labAnchors.length;i++) labAnchors[i].remove();
-      // Normalize the first
       const first = labAnchors[0];
       first.classList.add("lab-link");
+      first.setAttribute("href", "carbon-lab.html");
       if (!/carbon\s*lab/i.test(first.textContent || "")) first.innerHTML = "<span>Carbon Lab ✨</span>";
-      if (!/carbon-lab\.html$/i.test(normalizeHref(first))) first.setAttribute("href", "carbon-lab.html");
     }
   }
 
-  function init(){
-    ensureSingleLabLink();
+  function initOffcanvas(){
+    if (window.__ghsOffcanvasV2) return;
+    window.__ghsOffcanvasV2 = true;
 
-    // Off-canvas mobile drawer (clone from header, with dedupe-by-href)
-    if (!window.__ghsOffcanvasInit){
-      window.__ghsOffcanvasInit = true;
-      const btn = document.getElementById("menu-toggle");
-      const src = document.getElementById("main-menu") || document.querySelector(".menu");
-      if (btn && src){
-        if (!document.getElementById("ghs-offcanvas-style")){
-          const s = document.createElement("style"); s.id = "ghs-offcanvas-style";
-          s.textContent = `
+    const btn = document.getElementById("menu-toggle");
+    const src = document.getElementById("main-menu") || document.querySelector(".menu");
+    if (!btn || !src) return;
+
+    if (!document.getElementById("ghs-offcanvas-style")){
+      const s = document.createElement("style"); s.id = "ghs-offcanvas-style";
+      s.textContent = `
 #ghs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s;z-index:2990}
 #ghs-overlay.open{opacity:1;pointer-events:auto}
 #ghs-offcanvas{position:fixed;top:0;left:0;bottom:0;width:min(82vw,380px);transform:translateX(-110%);transition:transform .22s ease;z-index:3000;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:16px 12px;overflow:auto}
@@ -277,55 +282,61 @@ document.addEventListener("DOMContentLoaded", () => {
 #ghs-offcanvas .ghs-menu a{display:block;padding:12px 10px;border-radius:10px;font-weight:700;text-decoration:none;color:#0b4b3f}
 #ghs-offcanvas .ghs-menu a:hover{background:#f0fffb}
 @media (min-width:900px){#ghs-overlay{display:none}#ghs-offcanvas{display:none}}
-          `;
-          document.head.appendChild(s);
-        }
-        let overlay = document.getElementById("ghs-overlay");
-        if (!overlay){ overlay = document.createElement("div"); overlay.id="ghs-overlay"; document.body.appendChild(overlay); }
-        let panel = document.getElementById("ghs-offcanvas");
-        if (!panel){
-          panel = document.createElement("aside");
-          panel.id="ghs-offcanvas"; panel.setAttribute("role","dialog"); panel.setAttribute("aria-modal","true");
-          panel.innerHTML = `<nav class="ghs-menu" aria-label="Mobile"></nav>`;
-          document.body.appendChild(panel);
-        }
-        const menu = panel.querySelector(".ghs-menu");
-        function rebuild(){
-          menu.innerHTML = "";
-          const seen = new Set();
-          src.querySelectorAll("a").forEach(a=>{
-            const href = normalizeHref(a);
-            if (!href || seen.has(href)) return;
-            seen.add(href);
-            const c = a.cloneNode(true);
-            c.removeAttribute("id");
-            c.addEventListener("click", () => {
-              overlay.classList.remove("open");
-              panel.classList.remove("open");
-              document.body.style.overflow="";
-            });
-            menu.appendChild(c);
-          });
-        }
-        function open(){ rebuild(); panel.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow="hidden"; }
-        function close(){ panel.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow=""; }
-        function toggle(){ panel.classList.contains("open") ? close() : open(); }
-        btn.addEventListener("click", toggle);
-        overlay.addEventListener("click", close);
-        document.addEventListener("keydown", e=>{ if(e.key==="Escape") close(); });
-
-        // Observe header changes (e.g., if nav is modified later)
-        new MutationObserver(()=>{ ensureSingleLabLink(); rebuild(); }).observe(src, {childList:true, subtree:true});
-
-        // Expose (optional)
-        window.__ghsRebuildOffcanvas = rebuild;
-      }
+      `;
+      document.head.appendChild(s);
     }
+    let overlay = document.getElementById("ghs-overlay");
+    if (!overlay){ overlay = document.createElement("div"); overlay.id="ghs-overlay"; document.body.appendChild(overlay); }
+    let panel = document.getElementById("ghs-offcanvas");
+    if (!panel){
+      panel = document.createElement("aside");
+      panel.id="ghs-offcanvas"; panel.setAttribute("role","dialog"); panel.setAttribute("aria-modal","true");
+      panel.innerHTML = `<nav class="ghs-menu" aria-label="Mobile"></nav>`;
+      document.body.appendChild(panel);
+    }
+    const menu = panel.querySelector(".ghs-menu");
+
+    function rebuild(){
+      const seen = new Set();
+      menu.innerHTML = "";
+      src.querySelectorAll("a").forEach(a=>{
+        let key = normalizeHref(a);
+        if (!key) return;
+        // Canonicalize lab variants to a single key
+        if (key === "carbon-lab") key = "carbon-lab.html";
+        if (seen.has(key)) return;
+        seen.add(key);
+        const c = a.cloneNode(true);
+        if (key === "carbon-lab.html") c.setAttribute("href","carbon-lab.html");
+        c.removeAttribute("id");
+        c.addEventListener("click", () => {
+          overlay.classList.remove("open");
+          panel.classList.remove("open");
+          document.body.style.overflow="";
+        });
+        menu.appendChild(c);
+      });
+    }
+
+    function open(){ rebuild(); panel.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow="hidden"; }
+    function close(){ panel.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow=""; }
+    function toggle(){ panel.classList.contains("open") ? close() : open(); }
+
+    btn.addEventListener("click", toggle);
+    overlay.addEventListener("click", close);
+    document.addEventListener("keydown", e=>{ if(e.key==="Escape") close(); });
+
+    new MutationObserver(()=>{ ensureSingleLabLink(); rebuild(); })
+      .observe(src, {childList:true, subtree:true});
+
+    window.__ghsRebuildOffcanvas = rebuild;
   }
 
+  function init(){
+    ensureSingleLabLink();
+    initOffcanvas();
+  }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
-
-  // Safety: run once more after late injections
-  setTimeout(init, 500);
+  setTimeout(init, 600); // catch late injections
 })();
