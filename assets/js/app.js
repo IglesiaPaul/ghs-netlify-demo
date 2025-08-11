@@ -323,4 +323,40 @@ document.addEventListener("DOMContentLoaded", () => {
   new MutationObserver(()=>rebuild()).observe(src, {childList:true, subtree:true});
 })();
 
+/* === Off-canvas menu: dedupe links (prevents double Carbon Lab) === */
+(function(){
+  const panel = document.getElementById('ghs-offcanvas');
+  const src = document.getElementById('main-menu') || document.querySelector('.menu');
+  if (!panel || !src) return;
+  const menu = panel.querySelector('.ghs-menu');
+
+  function rebuild(){
+    if (!menu) return;
+    const seen = new Set();             // track hrefs we've added
+    menu.innerHTML = '';
+    src.querySelectorAll('a').forEach(a=>{
+      const href = (a.getAttribute('href')||'').replace(/#.*$/,'');
+      if (!href || seen.has(href)) return;    // skip duplicates
+      seen.add(href);
+      const c = a.cloneNode(true);
+      c.removeAttribute('id');                // avoid duplicate IDs
+      c.addEventListener('click', () => {
+        document.getElementById('ghs-overlay')?.classList.remove('open');
+        panel.classList.remove('open');
+        document.body.style.overflow='';
+      });
+      menu.appendChild(c);
+    });
+  }
+
+  // expose to the existing off-canvas script if present
+  window.__ghsRebuildOffcanvas = rebuild;
+
+  // run once now
+  rebuild();
+
+  // if your off-canvas initializer had a MutationObserver, keep it:
+  // it will call rebuild() again via window.__ghsRebuildOffcanvas if needed
+})();
+
 
