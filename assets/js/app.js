@@ -253,3 +253,85 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 })();
 
+/* === Mobile menu fix (idempotent) === */
+(function () {
+  if (window.__ghsMenuInit) return; // don't double-init
+  window.__ghsMenuInit = true;
+
+  // 1) Ensure minimal CSS exists
+  if (!document.getElementById("ghs-menu-style")) {
+    const style = document.createElement("style");
+    style.id = "ghs-menu-style";
+    style.textContent = `
+      #menu-overlay{position:fixed; inset:0; background:rgba(0,0,0,.2); opacity:0; pointer-events:none; transition:opacity .2s; z-index:1500}
+      #menu-overlay.open{opacity:1; pointer-events:auto}
+      .menu-panel{position:fixed; top:0; left:0; bottom:0; width:min(78vw,360px); max-width:90%;
+        transform:translateX(-110%); transition:transform .2s; background:#fff; padding:16px; z-index:2000; overflow:auto; box-shadow:0 20px 60px rgba(0,0,0,.2)}
+      .menu-panel.open{transform:translateX(0)}
+      @media (min-width: 900px){
+        .menu-panel{position:static; transform:none; width:auto; box-shadow:none; padding:0}
+        #menu-overlay{display:none}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function setupMobileMenu() {
+    const btn = document.getElementById("menu-toggle");
+    const panel = document.getElementById("main-menu") || document.querySelector(".menu");
+    let overlay = document.getElementById("menu-overlay");
+    if (!overlay) { overlay = document.createElement("div"); overlay.id = "menu-overlay"; document.body.prepend(overlay); }
+    if (!btn || !panel) return;
+
+    function open() {
+      panel.classList.add("open");
+      overlay.classList.add("open");
+      btn.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
+      trapFocus();
+    }
+    function close() {
+      panel.classList.remove("open");
+      overlay.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+      releaseFocus();
+    }
+    function toggle() { panel.classList.contains("open") ? close() : open(); }
+
+    btn.addEventListener("click", toggle);
+    overlay.addEventListener("click", close);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+    panel.addEventListener("click", (e) => { if (e.target.tagName === "A") close(); });
+
+    // simple focus trap
+    let lastFocus = null;
+    function trapFocus(){
+      lastFocus = document.activeElement;
+      panel.addEventListener("keydown", loop);
+      const f = panel.querySelectorAll('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      if (f.length) f[0].focus();
+    }
+    function loop(e){
+      if (e.key !== "Tab") return;
+      const f = panel.querySelectorAll('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      const first = f[0], last = f[f.length - 1];
+      if (!first || !last) return;
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    function releaseFocus(){ panel.removeEventListener("keydown", loop); if (lastFocus) lastFocus.focus(); }
+
+    // expose (optional)
+    window.openSiteMenu = open;
+    window.closeSiteMenu = close;
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupMobileMenu);
+  } else {
+    setupMobileMenu();
+  }
+})();
+
+
