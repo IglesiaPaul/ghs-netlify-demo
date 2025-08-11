@@ -1,19 +1,80 @@
-/* Drop-in replacement with sticky z-fix */
-/* === Carbon Lab sticky bar z-index + layout fix === */
-/* Ensure sticky bottom bar overlays all content and remains clickable */
-@media (max-width: 560px){
-  .lab-page { padding-bottom: 88px; } /* reserve space for fixed bar */
+/* === Hemp Swap Lab (scoped, restored layout) === */
+.lab-page .lab-hero{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media (max-width: 900px){ .lab-page .lab-hero{grid-template-columns:1fr} }
+
+.lab-page .card{border:1px solid #eef2ef; background:#fff; border-radius:16px; padding:16px; box-shadow:0 12px 32px rgba(0,0,0,.06)}
+.lab-page .card h2{margin:0 0 8px 0}
+.lab-page .small{font-size:12px; opacity:.85}
+.lab-page .grid{display:grid; gap:12px}
+.lab-page .grid.cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
+@media (max-width: 900px){ .lab-page .grid.cols-3{grid-template-columns:repeat(2, minmax(0,1fr))} }
+@media (max-width: 520px){ .lab-page .grid.cols-3{grid-template-columns:1fr} }
+
+.lab-page .inv-card{border:1px dashed #e3f7f1; border-radius:14px; padding:10px; background:linear-gradient(180deg,#f9fffc,#f7fbff); cursor:grab; display:grid; gap:8px}
+.lab-page .inv-card:active{cursor:grabbing}
+.lab-page .inv-card .t{font-weight:700}
+.lab-page .inv-card .s{font-size:12px; opacity:.8}
+.lab-page .inv-card .img{height:120px; display:grid; place-items:center; border-radius:10px; background:#f0fffb; overflow:hidden}
+@media (max-width:520px){ .lab-page .inv-card .img{height:160px} }
+.lab-page .inv-card img{width:100%; height:100%; object-fit:cover; display:block}
+.lab-page .inv-card .btn-row{display:flex; gap:8px; flex-wrap:wrap}
+.lab-page .inv-card .btn-sm{padding:8px 10px; border-radius:10px; border:1px solid #d9f8ef; background:#38E2B5; color:#003a2e; font-weight:700; cursor:pointer}
+.lab-page .inv-card .btn-sm.ghost{background:#fff; color:#0b7c3f}
+
+.lab-page .cauldron{position:relative; border:2px dashed #bfeee2; border-radius:20px; min-height:260px; background:repeating-linear-gradient(135deg, rgba(56,226,181,.06) 0 12px, rgba(0,0,0,0) 12px 24px); overflow:hidden}
+.lab-page .cauldron.drop{border-color:#38E2B5; box-shadow:0 0 0 4px rgba(56,226,181,.15) inset}
+.lab-page .cauldron .inner{padding:16px; position:relative; z-index:1}
+.lab-page .cauldron .cta{opacity:.8; text-align:center; padding:16px; font-size:14px}
+.lab-page .bubbles{position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:0}
+.lab-page .bubble{position:absolute; bottom:-24px; width:10px; height:10px; background:radial-gradient(circle at 30% 30%, #d8fff5, #8cf5db 70%, rgba(0,0,0,0) 72%); border-radius:50%; opacity:.8; filter:blur(.2px)}
+@keyframes rise { 0%{ transform:translateY(0) scale(.8); opacity:.0 } 10%{opacity:.9} 90%{opacity:.9} 100%{ transform:translateY(-120%) scale(1.1); opacity:0 } }
+@media (prefers-reduced-motion: reduce){
+  .lab-page .bubble{ animation:none !important }
+  .menu a.lab-link::before{ animation:none !important }
+}
+
+/* KPI grid responsiveness */
+.lab-page .kpis{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+@media (max-width:720px){ .lab-page .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:420px){ .lab-page .kpis{grid-template-columns:1fr} }
+.lab-page .kpi{background:#0d1b16; color:#c8fff0; border-radius:12px; padding:12px; border:1px solid #143d31; box-shadow: inset 0 0 0 1px rgba(56,226,181,.15)}
+.lab-page .kpi .label{font-size:12px; opacity:.85}
+.lab-page .kpi .value{font-size:20px; font-weight:800}
+
+.lab-page .badges{display:flex; gap:8px; flex-wrap:wrap}
+.lab-page .badge{background:#eafff6; border:1px solid #b7f2e0; padding:6px 10px; border-radius:999px; font-size:13px}
+.lab-page .badge:active{transform:scale(.98)}
+
+.lab-page .actions-row{display:flex; gap:8px; flex-wrap:wrap}
+.lab-page .btn{cursor:pointer; padding:10px 14px; border-radius:12px; border:1px solid #d9f8ef; background:#38E2B5; color:#003a2e; font-weight:700}
+.lab-page .btn.ghost{background:#fff; color:#0b7c3f}
+
+/* Sticky CTA (fixed on mobile) */
+.lab-page .sticky-cta{display:none; align-items:center; gap:14px; padding:10px 14px; background:#0d1b16; color:#c8fff0; border:1px solid #143d31; border-radius:14px; margin-top:14px}
+.lab-page .sticky-cta .k{font-size:12px; opacity:.8}
+.lab-page .sticky-cta .v{font-weight:800}
+.lab-page .sticky-cta .spacer{flex:1}
+.lab-page .sticky-cta .btn{white-space:nowrap}
+@media (max-width:560px){
+  .lab-page{ padding-bottom: 88px; }
   .lab-page .sticky-cta{
-    position: fixed !important;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 2500;       /* above content (cauldron inner z-index:1), below toast (3000) */
-    border-radius: 14px 14px 0 0;
-    margin: 0;           /* detach from flow */
+    display:flex;
+    position:fixed; left:0; right:0; bottom:0;
+    z-index:2500; border-radius:14px 14px 0 0; margin:0;
   }
 }
 
-/* Defensive: cauldron inner shouldn't overlay UI bars */
-.lab-page .cauldron .inner{ position:relative; z-index: 1; }
-.lab-page .bubbles{ z-index: 0; }
+/* Assumptions table */
+.lab-page .assump{margin-top:10px}
+.lab-page .assump table{width:100%; border-collapse:collapse}
+.lab-page .assump th,.lab-page .assump td{border-bottom:1px solid #eef2ef; padding:8px; text-align:left; font-size:13px}
+
+/* Toast */
+.lab-page .toast{position:fixed; right:16px; bottom:76px; background:#0d1b16; color:#c8fff0; border:1px solid #143d31; border-radius:12px; padding:10px 14px; z-index:3000; display:none}
+.lab-page .toast.show{display:block}
+
+/* Carbon Lab nav highlight (global-safe) */
+.menu a.lab-link{position:relative; display:inline-block; border-radius:999px; padding:6px 10px; font-weight:700; overflow:hidden; border:1px solid #d9f8ef}
+.menu a.lab-link::before{content:""; position:absolute; inset:-30%; background:conic-gradient(from 0deg, rgba(56,226,181,.4), transparent 40%, rgba(56,226,181,.35) 60%, transparent 100%); animation:twist 4.8s linear infinite; z-index:0; filter:blur(10px)}
+.menu a.lab-link span{position:relative; z-index:1}
+@keyframes twist{ to { transform:rotate(360deg);} }
