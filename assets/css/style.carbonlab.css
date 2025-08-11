@@ -1,4 +1,4 @@
-/* === Hemp Swap Lab === */
+/* === Hemp Swap Lab (mobile-optimized) === */
 .lab-hero{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
 @media (max-width: 900px){ .lab-hero{grid-template-columns:1fr} }
 
@@ -9,29 +9,38 @@
 .grid.cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
 .grid.cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
 @media (max-width: 900px){ .grid.cols-3{grid-template-columns:repeat(2, minmax(0,1fr))} }
+@media (max-width: 520px){ .grid.cols-3{grid-template-columns:1fr} }
 
-.inv-card{border:1px dashed #e3f7f1; border-radius:14px; padding:10px; background:linear-gradient(180deg,#f9fffc,#f7fbff); cursor:grab}
+.inv-card{border:1px dashed #e3f7f1; border-radius:14px; padding:10px; background:linear-gradient(180deg,#f9fffc,#f7fbff); cursor:grab; display:grid; gap:8px}
 .inv-card:active{cursor:grabbing}
 .inv-card .t{font-weight:700}
 .inv-card .s{font-size:12px; opacity:.8}
 .inv-card .img{height:120px; display:grid; place-items:center; border-radius:10px; background:#f0fffb; overflow:hidden}
+@media (max-width:520px){ .inv-card .img{height:160px} }
 .inv-card img{width:100%; height:100%; object-fit:cover; display:block}
+.inv-card .btn-row{display:flex; gap:8px; flex-wrap:wrap}
+.inv-card .btn-sm{padding:8px 10px; border-radius:10px; border:1px solid #d9f8ef; background:#38E2B5; color:#003a2e; font-weight:700; cursor:pointer}
+.inv-card .btn-sm.ghost{background:#fff; color:#0b7c3f}
 
-.cauldron{position:relative; border:2px dashed #bfeee2; border-radius:20px; min-height:240px; background:repeating-linear-gradient(135deg, rgba(56,226,181,.06) 0 12px, rgba(0,0,0,0) 12px 24px)}
+.cauldron{position:relative; border:2px dashed #bfeee2; border-radius:20px; min-height:260px; background:repeating-linear-gradient(135deg, rgba(56,226,181,.06) 0 12px, rgba(0,0,0,0) 12px 24px)}
 .cauldron.drop{border-color:#38E2B5; box-shadow:0 0 0 4px rgba(56,226,181,.15) inset}
 .cauldron .inner{padding:16px}
-.cauldron .cta{opacity:.8; text-align:center; padding:24px}
+.cauldron .cta{opacity:.8; text-align:center; padding:16px; font-size:14px}
 
 .kpis{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+@media (max-width:720px){ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:420px){ .kpis{grid-template-columns:1fr} }
 .kpi{background:#0d1b16; color:#c8fff0; border-radius:12px; padding:12px; border:1px solid #143d31; box-shadow: inset 0 0 0 1px rgba(56,226,181,.15)}
 .kpi .label{font-size:12px; opacity:.85}
 .kpi .value{font-size:20px; font-weight:800}
 
 .badges{display:flex; gap:8px; flex-wrap:wrap}
-.badge{background:#eafff6; border:1px solid #b7f2e0; padding:4px 8px; border-radius:999px; font-size:12px}
+.badge{background:#eafff6; border:1px solid #b7f2e0; padding:6px 10px; border-radius:999px; font-size:13px}
+.badge:active{transform:scale(.98)}
 
 .actions-row{display:flex; gap:8px; flex-wrap:wrap}
-.btn{cursor:pointer}
+.btn{cursor:pointer; padding:10px 14px; border-radius:12px; border:1px solid #d9f8ef; background:#38E2B5; color:#003a2e; font-weight:700}
+.btn.ghost{background:#fff; color:#0b7c3f}
 
 .assump{margin-top:10px}
 .assump table{width:100%; border-collapse:collapse}
