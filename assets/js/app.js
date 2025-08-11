@@ -1,74 +1,87 @@
-/* ----------------- State + Persistence ----------------- */
-const STORAGE = {
-  cart: "ghs_cart",
-  tokens: "ghs_tokens",
-  seenTour: "ghs_seen_tour"
-};
+/* --------------- Safe storage wrapper --------------- */
+const storage = (() => {
+  try {
+    const testKey = "__ghs_t";
+    localStorage.setItem(testKey, "1");
+    localStorage.removeItem(testKey);
+    return {
+      get: (k) => localStorage.getItem(k),
+      set: (k, v) => localStorage.setItem(k, v),
+      remove: (k) => localStorage.removeItem(k),
+    };
+  } catch (e) {
+    const mem = {};
+    return {
+      get: (k) => (k in mem ? mem[k] : null),
+      set: (k, v) => { mem[k] = v; },
+      remove: (k) => { delete mem[k]; },
+    };
+  }
+})();
 
+/* --------------- Keys & Defaults --------------- */
+const STORAGE = { cart: "ghs_cart", tokens: "ghs_tokens", seenTour: "ghs_seen_tour" };
 const DefaultTokens = { balance: 120, tier: "Green" };
 
+/* --------------- Global State --------------- */
 const State = {
   cart: [],
   user: {
     name: "Guest",
     country: Intl.DateTimeFormat().resolvedOptions().timeZone || "Local",
-    currency: (Intl.NumberFormat().resolvedOptions().currency) || "EUR"
+    currency: (Intl.NumberFormat().resolvedOptions().currency) || "EUR",
   },
   tokens: { ...DefaultTokens },
 };
 
+/* --------------- Persistence helpers --------------- */
 function saveState() {
   try {
-    localStorage.setItem(STORAGE.cart, JSON.stringify(State.cart));
-    localStorage.setItem(STORAGE.tokens, JSON.stringify(State.tokens));
+    storage.set(STORAGE.cart, JSON.stringify(State.cart));
+    storage.set(STORAGE.tokens, JSON.stringify(State.tokens));
   } catch (e) {}
 }
 
 function loadState() {
   try {
-    const cart = JSON.parse(localStorage.getItem(STORAGE.cart) || "[]");
-    const tokens = JSON.parse(localStorage.getItem(STORAGE.tokens) || "null");
+    const cart = JSON.parse(storage.get(STORAGE.cart) || "[]");
+    const tokens = JSON.parse(storage.get(STORAGE.tokens) || "null");
     if (Array.isArray(cart)) State.cart = cart;
     if (tokens && typeof tokens === "object") State.tokens = tokens;
   } catch (e) {}
 }
 
+/* --------------- Reset --------------- */
 function resetDemo() {
   State.cart = [];
   State.tokens = { ...DefaultTokens };
   saveState();
+  try { storage.remove(STORAGE.seenTour); } catch (e) {}
   renderCartBadge();
-  try { localStorage.removeItem(STORAGE.seenTour); } catch(e){}
   alert("Demo reset. Cart cleared and WETAS set to default.");
   if (document.querySelector("#cart-table")) renderCartPage();
   if (document.querySelector("#token-balance")) renderWallet();
 }
 
-/* ----------------- Catalog + Rewards ----------------- */
+/* --------------- Catalog & Rewards --------------- */
 const Catalog = [
-  {id:1, name:"Hemp Blend Tee", vendor:"GreenWeave", category:"Apparel", price:29, img:"assets/img/ph1.svg"},
-  {id:2, name:"Hemp Protein Powder", vendor:"NutriHemp", category:"Food", price:19, img:"assets/img/ph2.svg"},
-  {id:3, name:"Hempcrete Brick", vendor:"EcoBuild Co.", category:"Construction", price:8, img:"assets/img/ph3.svg"},
-  {id:4, name:"Hemp Facial Oil", vendor:"Verdant Glow", category:"Wellness", price:24, img:"assets/img/ph4.svg"},
-  {id:5, name:"Hemp Tote Bag", vendor:"Loom&Leaf", category:"Accessories", price:18, img:"assets/img/ph5.svg"},
-  {id:6, name:"Hemp Rope 10m", vendor:"Mariner", category:"Industrial", price:12, img:"assets/img/ph6.svg"}
+  { id: 1, name: "Hemp Blend Tee", vendor: "GreenWeave", category: "Apparel", price: 29, img: "assets/img/ph1.svg" },
+  { id: 2, name: "Hemp Protein Powder", vendor: "NutriHemp", category: "Food", price: 19, img: "assets/img/ph2.svg" },
+  { id: 3, name: "Hempcrete Brick", vendor: "EcoBuild Co.", category: "Construction", price: 8, img: "assets/img/ph3.svg" },
+  { id: 4, name: "Hemp Facial Oil", vendor: "Verdant Glow", category: "Wellness", price: 24, img: "assets/img/ph4.svg" },
+  { id: 5, name: "Hemp Tote Bag", vendor: "Loom&Leaf", category: "Accessories", price: 18, img: "assets/img/ph5.svg" },
+  { id: 6, name: "Hemp Rope 10m", vendor: "Mariner", category: "Industrial", price: 12, img: "assets/img/ph6.svg" },
 ];
 
-const TokenRules = {
-  "Apparel": 2,
-  "Food": 3,
-  "Construction": 8,
-  "Wellness": 2,
-  "Accessories": 1,
-  "Industrial": 5
-};
+const TokenRules = { Apparel: 2, Food: 3, Construction: 8, Wellness: 2, Accessories: 1, Industrial: 5 };
 
-/* ----------------- Cart + Wallet ----------------- */
+/* --------------- Cart + Wallet --------------- */
 function addToCart(id) {
-  const p = Catalog.find(x => x.id === id);
+  const p = Catalog.find((x) => x.id === id);
   if (!p) return;
-  const found = State.cart.find(x => x.id === id);
-  if (found) { found.qty += 1; } else { State.cart.push({ ...p, qty: 1 }); }
+  const found = State.cart.find((x) => x.id === id);
+  if (found) found.qty += 1;
+  else State.cart.push({ ...p, qty: 1 });
   saveState();
   renderCartBadge();
   alert(`Added to cart: ${p.name}`);
@@ -77,10 +90,12 @@ function addToCart(id) {
 function renderCartBadge() {
   const n = State.cart.reduce((a, b) => a + b.qty, 0);
   const el = document.querySelector("#cart-badge");
-  if (el) { el.textContent = n; }
+  if (el) el.textContent = n;
 }
 
-function currency(n) { return new Intl.NumberFormat(undefined, { style: "currency", currency: "EUR" }).format(n); }
+function currency(n) {
+  return new Intl.NumberFormat(undefined, { style: "currency", currency: "EUR" }).format(n);
+}
 
 function renderProducts(target = "#product-grid") {
   const grid = document.querySelector(target);
@@ -90,14 +105,13 @@ function renderProducts(target = "#product-grid") {
     const div = document.createElement("div");
     div.className = "product";
     div.innerHTML = `
-      <img src="${p.img}" alt="${p.name}"/>
+      <img src="${p.img}" alt="${p.name}" />
       <div class="p-body">
         <div class="tag">${p.vendor}</div>
         <h4>${p.name}</h4>
         <div class="price">€${p.price}</div>
         <button class="btn" onclick="addToCart(${p.id})">Add to cart</button>
-      </div>
-    `;
+      </div>`;
     grid.appendChild(div);
   }
 }
@@ -141,12 +155,11 @@ function renderWallet() {
     spot.innerHTML = `
       <div class="card"><b>Buy 2 Apparel</b> → +10 WETAS bonus</div>
       <div class="card"><b>EcoBuild Co. week</b> → 5% off hempcrete</div>
-      <div class="card"><b>WETAS Impact</b> → Your last order stored 2.4kg CO₂e</div>
-    `;
+      <div class="card"><b>WETAS Impact</b> → Your last order stored 2.4kg CO₂e</div>`;
   }
 }
 
-/* ----------------- Mobile menu ----------------- */
+/* --------------- Mobile menu --------------- */
 function setupMobileMenu() {
   const btn = document.getElementById("menu-toggle");
   const menu = document.getElementById("main-menu");
@@ -159,14 +172,11 @@ function setupMobileMenu() {
   menu.addEventListener("click", (e) => { if (e.target.tagName === "A") close(); });
 }
 
-/* ----------------- Investor Tour ----------------- */
+/* --------------- Investor Tour --------------- */
 function buildTour() {
   if (document.getElementById("tour-overlay")) return;
-  const overlay = document.createElement("div");
-  overlay.id = "tour-overlay";
-
-  const card = document.createElement("div");
-  card.id = "tour-card";
+  const overlay = document.createElement("div"); overlay.id = "tour-overlay";
+  const card = document.createElement("div"); card.id = "tour-card";
   card.innerHTML = `
     <h3>Investor Tour</h3>
     <ol id="tour-steps">
@@ -178,21 +188,21 @@ function buildTour() {
     <div class="tour-actions">
       <button class="btn ghost" id="tour-close">Close</button>
       <a class="btn" href="marketplace.html" id="tour-start">Go to Marketplace</a>
-    </div>
-  `;
-
+    </div>`;
   overlay.addEventListener("click", closeTour);
   document.body.appendChild(overlay);
   document.body.appendChild(card);
-
-  document.getElementById("tour-close").addEventListener("click", closeTour);
+  document.getElementById("tour-close").addEventListener("click", () => {
+    closeTour();
+    try { storage.set(STORAGE.seenTour, "1"); } catch (e) {}
+  });
 }
 
 function openTour() {
   buildTour();
   document.getElementById("tour-overlay").style.display = "block";
   document.getElementById("tour-card").style.display = "block";
-  try { localStorage.setItem(STORAGE.seenTour, "1"); } catch (e) {}
+  try { storage.set(STORAGE.seenTour, "1"); } catch (e) {}
 }
 
 function closeTour() {
@@ -202,28 +212,26 @@ function closeTour() {
   if (c) c.style.display = "none";
 }
 
-/* ----------------- Init ----------------- */
+/* --------------- Init --------------- */
 document.addEventListener("DOMContentLoaded", () => {
   loadState();
   renderCartBadge();
   setupMobileMenu();
   buildTour();
 
-  // Add FAB
+  // FAB
   const fab = document.createElement("button");
-  fab.id = "tour-fab";
-  fab.setAttribute("title", "Investor Tour");
-  fab.textContent = "?";
+  fab.id = "tour-fab"; fab.title = "Investor Tour"; fab.textContent = "?";
   fab.addEventListener("click", openTour);
   document.body.appendChild(fab);
 
-  // Wire header reset button if present
+  // Header reset
   const resetBtn = document.getElementById("reset-btn");
   if (resetBtn) resetBtn.addEventListener("click", (e) => { e.preventDefault(); resetDemo(); });
 
   // Auto-open once
   try {
-    if (!localStorage.getItem(STORAGE.seenTour)) {
+    if (!storage.get(STORAGE.seenTour)) {
       setTimeout(openTour, 700);
     }
   } catch (e) {}
