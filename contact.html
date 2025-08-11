@@ -32,14 +32,19 @@
   <h1>Contact</h1>
   <p>Use this demo form (non-functional) or email: hello@example.com</p>
   <div class="card">
-    <form onsubmit="event.preventDefault(); alert('Demo form submitted!');">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
-        <input placeholder="Name" required/>
-        <input placeholder="Email" type="email" required/>
-      </div>
-      <textarea placeholder="Message" style="width:100%; height:120px; margin-top:12px" required></textarea>
-      <div style="margin-top:12px"><button class="btn">Send</button></div>
-    </form>
+   <form name="contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" action="/thank-you">
+  <input type="hidden" name="form-name" value="contact">
+  <p style="display:none">
+    <label>Don’t fill this out: <input name="bot-field"></label>
+  </p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+    <input name="name" placeholder="Name" required />
+    <input name="email" type="email" placeholder="Email" required />
+  </div>
+  <textarea name="message" placeholder="Message" style="width:100%; height:120px; margin-top:12px" required></textarea>
+  <div style="margin-top:12px"><button class="btn">Send</button></div>
+</form>
+
   </div>
 </div>
 
