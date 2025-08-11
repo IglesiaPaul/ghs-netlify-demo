@@ -1,6 +1,5 @@
-/* === Hemp Swap Lab === */
+/* === Hemp Swap Lab (mobile+) === */
 (function(){
-  // Confetti helper (inline)
   function confettiBurst(x=window.innerWidth/2, y=window.innerHeight/2){
     const n=18, dur=900;
     for(let i=0;i<n;i++){
@@ -12,12 +11,10 @@
     }
   }
 
-  // Safe storage
   const storage = (()=>{ try{ const k="__t"; localStorage.setItem(k,"1"); localStorage.removeItem(k);
     return {get:(k)=>localStorage.getItem(k), set:(k,v)=>localStorage.setItem(k,v), remove:(k)=>localStorage.removeItem(k)};
   }catch(e){ const mem={}; return {get:(k)=>mem[k]||null,set:(k,v)=>{mem[k]=v},remove:(k)=>{delete mem[k]}}; }})();
 
-  // Items & assumptions (illustrative demo values)
   const Items = [
     { id: "tee", base:"Cotton Tee", hemp:"Hemp Blend Tee", category:"Apparel",
       baseImg:"", hempImg:"assets/img/products/apparel-tee.png",
@@ -40,10 +37,9 @@
   ];
   const TokenRules = { Apparel:2, Food:3, Construction:8, Wellness:2, Accessories:1, Industrial:5 };
 
-  const Lab = { swaps: [] }; // array of item ids
+  const Lab = { swaps: [] };
   const KEY = "ghs_lab_swaps";
 
-  // UI Nodes
   const inv = document.getElementById("inv");
   const cauldron = document.getElementById("cauldron");
   const list = document.getElementById("swap-list");
@@ -51,15 +47,26 @@
   const totalWater = document.getElementById("total-water");
   const totalWetas = document.getElementById("total-wetas");
 
-  function load(){
-    try{ const s = JSON.parse(storage.get(KEY)||"[]"); if(Array.isArray(s)) Lab.swaps = s; }catch(e){}
-  }
-  function save(){
-    try{ storage.set(KEY, JSON.stringify(Lab.swaps)); }catch(e){}
-  }
+  function load(){ try{ const s=JSON.parse(storage.get(KEY)||"[]"); if(Array.isArray(s)) Lab.swaps=s; }catch(e){} }
+  function save(){ try{ storage.set(KEY, JSON.stringify(Lab.swaps)); }catch(e){} }
 
   function fmtKg(n){ return (Math.round(n*10)/10).toFixed(1) + " kg"; }
   function fmtL(n){ return Math.round(n).toLocaleString() + " L"; }
+
+  function addSwap(id, evt){
+    const it = Items.find(x=>x.id===id);
+    if(!it) return;
+    Lab.swaps.push(id);
+    save(); renderSwaps(); renderTotals();
+    confettiBurst(evt?.clientX || window.innerWidth/2, evt?.clientY || window.innerHeight/2);
+    cauldron.classList.add("drop");
+    setTimeout(()=>cauldron.classList.remove("drop"), 500);
+    const savedCO2 = Math.max(0, it.co2e_base - it.co2e_hemp);
+    const savedH2O = Math.max(0, it.water_base - it.water_hemp);
+    const last = document.getElementById("result");
+    last.innerHTML = `<b>Swapped!</b> ${it.base} → <b>${it.hemp}</b> • Saved ${fmtKg(savedCO2)} CO₂e and ${fmtL(savedH2O)} water.`;
+    if(navigator.vibrate) try{ navigator.vibrate(12); }catch(e){}
+  }
 
   function renderInventory(){
     inv.innerHTML = "";
@@ -67,14 +74,37 @@
       const c = document.createElement("div");
       c.className = "inv-card";
       c.draggable = true;
+      c.tabIndex = 0;
+      c.setAttribute("role","button");
+      c.setAttribute("aria-label", `Swap ${it.base} for ${it.hemp}`);
       c.setAttribute("data-id", it.id);
       c.innerHTML = `
         <div class="img">${it.hempImg ? `<img src="${it.hempImg}" alt="${it.hemp}"/>` : "🧪"}</div>
         <div class="t">${it.base} → ${it.hemp}</div>
-        <div class="s small">${it.category}</div>`;
-      c.addEventListener("dragstart", (e)=>{
-        e.dataTransfer.setData("text/plain", it.id);
+        <div class="s small">${it.category}</div>
+        <div class="btn-row">
+          <button class="btn-sm" data-add="${it.id}">Add</button>
+          <button class="btn-sm ghost" data-info="${it.id}">Info</button>
+        </div>`;
+
+      // Mouse drag
+      c.addEventListener("dragstart", (e)=>{ e.dataTransfer.setData("text/plain", it.id); });
+      // Tap-to-add
+      c.addEventListener("click", (e)=>{
+        const target = e.target;
+        if (target && target.matches('[data-add]')) { addSwap(it.id, e); return; }
+        if (target && target.matches('[data-info]')) {
+          alert(`${it.base} → ${it.hemp}\nCategory: ${it.category}\nCO₂e: ${it.co2e_base} → ${it.co2e_hemp} kg\nWater: ${it.water_base} → ${it.water_hemp} L`);
+          return;
+        }
+        // If user taps the card anywhere else on mobile, treat as add
+        if (matchMedia("(pointer: coarse)").matches) addSwap(it.id, e);
       });
+      // Keyboard support
+      c.addEventListener("keydown", (e)=>{
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); addSwap(it.id, e); }
+      });
+
       inv.appendChild(c);
     });
   }
@@ -106,40 +136,19 @@
       const chip = document.createElement("span");
       chip.className = "badge";
       chip.textContent = it.hemp;
-      chip.title = "Click to undo";
-      chip.addEventListener("click", ()=>{
-        Lab.swaps.splice(idx,1);
-        save(); renderSwaps(); renderTotals();
-      });
+      chip.title = "Tap to undo";
+      chip.tabIndex = 0;
+      chip.setAttribute("role","button");
+      chip.addEventListener("click", ()=>{ Lab.swaps.splice(idx,1); save(); renderSwaps(); renderTotals(); });
+      chip.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); Lab.swaps.splice(idx,1); save(); renderSwaps(); renderTotals(); } });
       list.appendChild(chip);
     });
   }
 
-  function dropHandler(e){
-    e.preventDefault();
-    const id = e.dataTransfer.getData("text/plain");
-    const it = Items.find(x=>x.id===id);
-    if(!it) return;
-    Lab.swaps.push(id);
-    save(); renderSwaps(); renderTotals();
-    confettiBurst(e.clientX, e.clientY);
-    // animate border flash
-    cauldron.classList.add("drop");
-    setTimeout(()=>cauldron.classList.remove("drop"), 500);
-    // Show last result
-    const last = document.getElementById("result");
-    const savedCO2 = Math.max(0, it.co2e_base - it.co2e_hemp);
-    const savedH2O = Math.max(0, it.water_base - it.water_hemp);
-    last.innerHTML = `<b>Swapped!</b> ${it.base} → <b>${it.hemp}</b> • Saved ${fmtKg(savedCO2)} CO₂e and ${fmtL(savedH2O)} water.`;
-    if(navigator.vibrate) try{ navigator.vibrate(12); }catch(e){}
-  }
+  function dropHandler(e){ e.preventDefault(); const id = e.dataTransfer.getData("text/plain"); if(id) addSwap(id, e); }
   function dragOver(e){ e.preventDefault(); }
 
-  function resetLab(){
-    Lab.swaps = [];
-    save(); renderSwaps(); renderTotals();
-    document.getElementById("result").textContent = "Lab reset.";
-  }
+  function resetLab(){ Lab.swaps = []; save(); renderSwaps(); renderTotals(); document.getElementById("result").textContent = "Lab reset."; }
 
   function addToWallet(){
     const t = currentTotals();
@@ -149,7 +158,6 @@
         State.tokens.balance += t.wetas;
         saveState();
       } else {
-        // lightweight fallback
         const key = "ghs_tokens_fallback";
         const val = parseInt(storage.get(key)||"0",10);
         storage.set(key, String(val + t.wetas));
@@ -167,9 +175,9 @@
     setTimeout(()=>t.classList.remove("show"), 1600);
   }
 
-  // Assumptions table
   function renderAssumptions(){
     const tbody = document.getElementById("assump-rows");
+    if (!tbody) return;
     tbody.innerHTML = Items.map(it=>{
       const dC = Math.max(0, it.co2e_base - it.co2e_hemp).toFixed(1);
       const dW = Math.max(0, it.water_base - it.water_hemp);
@@ -187,14 +195,10 @@
   }
 
   document.addEventListener("DOMContentLoaded", ()=>{
-    // inventory
     renderInventory();
-    // totals
     load(); renderSwaps(); renderTotals(); renderAssumptions();
-    // dnd
     cauldron.addEventListener("dragover", dragOver, {passive:false});
     cauldron.addEventListener("drop", dropHandler);
-    // buttons
     document.getElementById("reset-lab").addEventListener("click", resetLab);
     document.getElementById("add-wallet").addEventListener("click", addToWallet);
   });
