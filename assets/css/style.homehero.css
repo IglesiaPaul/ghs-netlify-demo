@@ -1,11 +1,10 @@
-/* === Home Hero Product Cards (scoped to .home-hero) === */
+/* === Product Cards (shared) === */
 .home-hero{margin-top:10px}
 .home-hero .grid{display:grid; gap:14px; grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width: 1100px){ .home-hero .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (max-width: 780px){ .home-hero .grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width: 480px){ .home-hero .grid{grid-template-columns:1fr} }
 
-/* Card layout */
 .p-card{display:flex; flex-direction:column; border:1px solid #eef2ef; background:#fff; border-radius:16px; overflow:hidden;
   min-height:100%; box-shadow:0 8px 22px rgba(0,0,0,.06); transform:translateZ(0);}
 .p-card:focus-within{outline:2px solid #38E2B5; outline-offset:2px}
@@ -22,7 +21,6 @@
 .p-link{border:1px solid #d9f8ef; background:#fff; color:#0b7c3f; padding:10px 12px; border-radius:12px; text-decoration:none; font-weight:700; display:inline-block}
 .p-add{border:1px solid #d9f8ef; background:#38E2B5; color:#003a2e; padding:10px 14px; border-radius:12px; font-weight:800; cursor:pointer}
 
-/* Motion: hover/active lift + subtle tilt */
 .p-card{transition:transform .18s ease, box-shadow .18s ease}
 .p-card:hover{transform:translateY(-4px)}
 .p-card.is-active{transform:translateY(-3px) scale(1.01); box-shadow:0 14px 34px rgba(0,0,0,.12)}
@@ -30,12 +28,6 @@
   .p-card, .p-card:hover, .p-card.is-active{transition:none; transform:none; box-shadow:0 8px 22px rgba(0,0,0,.06)}
 }
 
-/* Buttons consistent height */
 .p-link, .p-add{height:40px; line-height:18px}
-
-/* Optional tiny badge row (category/tags) */
 .p-tags{display:flex; gap:6px; flex-wrap:wrap}
 .p-tag{background:#eafff6; border:1px solid #b7f2e0; padding:4px 8px; border-radius:999px; font-size:12px}
-
-/* Hide the old tip under Browse Products if present */
-.home-hero .tip, .home-hero .hint, .home-hero .note{display:none !important}
