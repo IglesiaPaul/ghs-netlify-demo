@@ -340,3 +340,61 @@ document.addEventListener("DOMContentLoaded", () => {
   else init();
   setTimeout(init, 600); // catch late injections
 })();
+
+/* === Wallet link highlight (gold glow, low-impact, no balance) === */
+(function(){
+  if (window.__ghsWalletGlowInit) return;
+  window.__ghsWalletGlowInit = true;
+
+  // 1) Inject styles once (works in header .menu and mobile .ghs-menu)
+  if (!document.getElementById("wallet-link-style")) {
+    const style = document.createElement("style");
+    style.id = "wallet-link-style";
+    style.textContent = `
+      .menu a.wallet-link, .ghs-menu a.wallet-link{
+        position:relative; display:inline-block; border-radius:999px;
+        padding:6px 10px; font-weight:700; border:1px solid #ffe8b3;
+        overflow:hidden; background:#fff;
+      }
+      .menu a.wallet-link::before, .ghs-menu a.wallet-link::before{
+        content:""; position:absolute; inset:-30%;
+        background:conic-gradient(from 0deg, rgba(255,216,107,.45), transparent 40%, rgba(255,216,107,.35) 60%, transparent 100%);
+        filter:blur(10px); z-index:0; animation:walletSpin 6s linear infinite;
+      }
+      .menu a.wallet-link span, .ghs-menu a.wallet-link span{ position:relative; z-index:1 }
+      @keyframes walletSpin{ to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce){
+        .menu a.wallet-link::before, .ghs-menu a.wallet-link::before{ animation:none !important }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // 2) Tag the Wallet link(s) so clones in the off-canvas keep the look
+  function markWalletLinks(){
+    const nav = document.getElementById('main-menu') || document.querySelector('.menu');
+    if (!nav) return;
+    nav.querySelectorAll('a').forEach(a=>{
+      const href = (a.getAttribute('href') || '').replace(/\?.*$/,'').replace(/#.*$/,'').replace(/^\//,'').toLowerCase();
+      const isWalletHref = href === 'wallet.html' || href === 'wallet';
+      const isWalletText = /wallet/i.test(a.textContent || '');
+      if (isWalletHref || isWalletText){
+        a.classList.add('wallet-link');
+        if (!/wallet/i.test(a.innerHTML)) { a.innerHTML = '<span>Wallet</span>'; }
+      }
+    });
+    // If a mobile drawer exists already, re-clone to pick up the class
+    if (window.__ghsRebuildOffcanvas) window.__ghsRebuildOffcanvas();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', markWalletLinks);
+  } else {
+    markWalletLinks();
+  }
+  // Re-apply after any nav mutations (e.g., when Carbon Lab is injected/deduped)
+  const nav = document.getElementById('main-menu') || document.querySelector('.menu');
+  if (nav) new MutationObserver(markWalletLinks).observe(nav, {childList:true, subtree:true});
+  setTimeout(markWalletLinks, 400); // catch late injections
+})();
+
