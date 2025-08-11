@@ -1,3 +1,4 @@
+
 /* --------------- Safe storage wrapper --------------- */
 const storage = (() => {
   try {
@@ -20,7 +21,7 @@ const storage = (() => {
 })();
 
 /* --------------- Keys & Defaults --------------- */
-const STORAGE = { cart: "ghs_cart", tokens: "ghs_tokens", seenTour: "ghs_seen_tour" };
+const STORAGE = { cart: "ghs_cart", tokens: "ghs_tokens" };
 const DefaultTokens = { balance: 120, tier: "Green" };
 
 /* --------------- Global State --------------- */
@@ -56,7 +57,6 @@ function resetDemo() {
   State.cart = [];
   State.tokens = { ...DefaultTokens };
   saveState();
-  try { storage.remove(STORAGE.seenTour); } catch (e) {}
   renderCartBadge();
   alert("Demo reset. Cart cleared and WETAS set to default.");
   if (document.querySelector("#cart-table")) renderCartPage();
@@ -172,67 +172,19 @@ function setupMobileMenu() {
   menu.addEventListener("click", (e) => { if (e.target.tagName === "A") close(); });
 }
 
-/* --------------- Investor Tour --------------- */
-function buildTour() {
-  if (document.getElementById("tour-overlay")) return;
-  const overlay = document.createElement("div"); overlay.id = "tour-overlay";
-  const card = document.createElement("div"); card.id = "tour-card";
-  card.innerHTML = `
-    <h3>Investor Tour</h3>
-    <ol id="tour-steps">
-      <li><b>Marketplace:</b> Tap <i>Add to cart</i> on any item.</li>
-      <li><b>Cart:</b> Open Cart → <i>Simulate Checkout</i>.</li>
-      <li><b>Wallet:</b> See your WETAS balance update by category rules.</li>
-      <li><b>Reset:</b> Use <i>Reset demo</i> anytime to restart.</li>
-    </ol>
-    <div class="tour-actions">
-      <button class="btn ghost" id="tour-close">Close</button>
-      <a class="btn" href="marketplace.html" id="tour-start">Go to Marketplace</a>
-    </div>`;
-  overlay.addEventListener("click", closeTour);
-  document.body.appendChild(overlay);
-  document.body.appendChild(card);
-  document.getElementById("tour-close").addEventListener("click", () => {
-    closeTour();
-    try { storage.set(STORAGE.seenTour, "1"); } catch (e) {}
-  });
-}
-
-function openTour() {
-  buildTour();
-  document.getElementById("tour-overlay").style.display = "block";
-  document.getElementById("tour-card").style.display = "block";
-  try { storage.set(STORAGE.seenTour, "1"); } catch (e) {}
-}
-
-function closeTour() {
-  const o = document.getElementById("tour-overlay");
-  const c = document.getElementById("tour-card");
-  if (o) o.style.display = "none";
-  if (c) c.style.display = "none";
-}
-
 /* --------------- Init --------------- */
 document.addEventListener("DOMContentLoaded", () => {
   loadState();
   renderCartBadge();
   setupMobileMenu();
-  buildTour();
 
-  // FAB
-  const fab = document.createElement("button");
-  fab.id = "tour-fab"; fab.title = "Investor Tour"; fab.textContent = "?";
-  fab.addEventListener("click", openTour);
-  document.body.appendChild(fab);
+  // If any tour elements exist from older HTML, remove them.
+  for (const sel of ["#tour-fab", "#tour-overlay", "#tour-card"]) {
+    const el = document.querySelector(sel);
+    if (el && el.parentNode) el.parentNode.removeChild(el);
+  }
 
-  // Header reset
+  // Wire Reset button if present
   const resetBtn = document.getElementById("reset-btn");
   if (resetBtn) resetBtn.addEventListener("click", (e) => { e.preventDefault(); resetDemo(); });
-
-  // Auto-open once
-  try {
-    if (!storage.get(STORAGE.seenTour)) {
-      setTimeout(openTour, 700);
-    }
-  } catch (e) {}
 });
