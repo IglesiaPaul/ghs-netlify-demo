@@ -107,6 +107,20 @@ function renderWallet(){
   }
 }
 
+/* --- Mobile menu toggling --- */
+function setupMobileMenu(){
+  const btn = document.getElementById("menu-toggle");
+  const menu = document.getElementById("main-menu");
+  const overlay = document.getElementById("menu-overlay");
+  if(!btn || !menu || !overlay) return;
+  const close = () => {{ menu.classList.remove("open"); overlay.classList.remove("open"); btn.setAttribute("aria-expanded","false"); }};
+  const open = () => {{ menu.classList.add("open"); overlay.classList.add("open"); btn.setAttribute("aria-expanded","true"); }};
+  btn.addEventListener("click", () => {{ menu.classList.contains("open") ? close() : open(); }});
+  overlay.addEventListener("click", close);
+  menu.addEventListener("click", (e) => {{ if(e.target.tagName === "A") close(); }});
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   renderCartBadge();
+  setupMobileMenu();
 });
