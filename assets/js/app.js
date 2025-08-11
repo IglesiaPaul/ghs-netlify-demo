@@ -408,3 +408,194 @@ document.addEventListener("DOMContentLoaded", () => {
   if (nav) new MutationObserver(markWalletLinks).observe(nav, {childList:true, subtree:true});
   setTimeout(markWalletLinks, 400);
 })();
+
+/* === Desktop header update: use off-canvas drawer site-wide ==================
+   - Hides inline link row on desktop; shows burger that opens the left panel
+   - Drawer ordering: Marketplace (purple) → Wallet (gold) → Carbon Lab (green) → Services→Contact → Cart (green with count)
+   - Injects styles; no HTML edits required
+============================================================================= */
+
+(function(){
+  if (window.__ghsDesktopHeaderInit) return;
+  window.__ghsDesktopHeaderInit = true;
+
+  // 1) Global header styles (hide inline nav on desktop; keep burger visible)
+  if (!document.getElementById("ghs-desktop-header-style")){
+    const s = document.createElement("style");
+    s.id = "ghs-desktop-header-style";
+    s.textContent = `
+/* Hide the inline menu row across breakpoints; we'll use the drawer */
+.menu.menu-panel{ display:none !important; }
+/* Make sure hamburger is visible on desktop */
+.hamburger{ display:inline-flex; align-items:center; justify-content:center; }
+
+/* Drawer visuals + highlight pills */
+#ghs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s;z-index:2990}
+#ghs-overlay.open{opacity:1;pointer-events:auto}
+#ghs-offcanvas{position:fixed;top:0;left:0;bottom:0;width:min(82vw,380px);transform:translateX(-110%);transition:transform .22s ease;z-index:3000;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:16px 12px;overflow:auto}
+#ghs-offcanvas.open{transform:translateX(0)}
+#ghs-offcanvas .ghs-menu a{display:block;padding:12px 12px;border-radius:12px;font-weight:700;text-decoration:none;color:#0b4b3f;margin:2px 0}
+#ghs-offcanvas .ghs-menu a:hover{background:#f0fffb}
+
+/* Order header label */
+#ghs-offcanvas .ghs-group{margin-top:8px; padding-top:8px; border-top:1px solid #eef2ef}
+#ghs-offcanvas .ghs-group:first-child{margin-top:0; padding-top:0; border-top:none}
+
+/* Highlight variants */
+a.marketplace-link{position:relative; border:1px solid #ead9ff; background:#fff;}
+a.marketplace-link::before{content:""; position:absolute; inset:-30%; background:conic-gradient(from 0deg, rgba(149, 93, 255, .45), transparent 40%, rgba(149, 93, 255, .35) 60%, transparent 100%); filter:blur(10px); z-index:0; animation:mpSpin 6s linear infinite;}
+a.marketplace-link span{position:relative; z-index:1}
+@keyframes mpSpin{ to { transform: rotate(360deg);} }
+
+/* Wallet (gold) is injected elsewhere; Carbon Lab (green) styles already exist */
+
+/* Cart link (green) */
+a.cart-link{ position:relative; border:1px solid #d9f8ef; background:#eafff6; color:#0b7c3f; display:flex; align-items:center; gap:8px; }
+a.cart-link .badge{ background:#0d1b16; color:#c8fff0; border:1px solid #143d31; }
+    `;
+    document.head.appendChild(s);
+  }
+
+  // 2) Ensure off-canvas infra exists (desktop too)
+  if (!document.getElementById("ghs-overlay")){
+    const ov = document.createElement("div"); ov.id = "ghs-overlay"; document.body.appendChild(ov);
+  }
+  if (!document.getElementById("ghs-offcanvas")){
+    const as = document.createElement("aside"); as.id = "ghs-offcanvas"; as.setAttribute("role","dialog"); as.setAttribute("aria-modal","true");
+    as.innerHTML = `<nav class="ghs-menu" aria-label="Site menu"></nav>`;
+    document.body.appendChild(as);
+  }
+
+  // 3) Drawer builder with ordering and highlights
+  function normalizeHref(href){
+    const raw = (href || "")
+      .replace(location.origin,"")
+      .replace(/^[a-z]+:\/\//i,"")
+      .replace(/^\//,"")
+      .replace(/\?.*$/,"")
+      .replace(/#.*$/,"");
+    if (/^carbon-lab(\/|$|\.html)/i.test(raw)) return "carbon-lab.html";
+    if (/^marketplace(\/|$|\.html)/i.test(raw)) return "marketplace.html";
+    if (/^wallet(\/|$|\.html)/i.test(raw)) return "wallet.html";
+    if (/^cart(\/|$|\.html)/i.test(raw)) return "cart.html";
+    return raw || "";
+  }
+
+  function cartCount(){ try{ return (window.State && Array.isArray(State.cart)) ? State.cart.reduce((a,b)=>a + (b.qty||0),0) : 0; }catch(e){ return 0; } }
+
+  function rebuildDrawer(){
+    const src = document.getElementById("main-menu") || document.querySelector(".menu");
+    const wrap = document.querySelector("#ghs-offcanvas .ghs-menu");
+    if (!src || !wrap) return;
+
+    const links = Array.from(src.querySelectorAll("a"));
+    const map = new Map();
+    links.forEach(a => {
+      const key = normalizeHref(a.getAttribute("href"));
+      if (!key || map.has(key)) return;
+      map.set(key, a);
+    });
+
+    function cloneFor(key, textOverride, extraClass=""){
+      const srcA = map.get(key);
+      let a;
+      if (srcA){
+        a = srcA.cloneNode(true);
+        a.removeAttribute("id");
+      } else {
+        a = document.createElement("a");
+        a.href = key;
+        a.textContent = textOverride || key.replace(".html","");
+      }
+      if (textOverride) a.innerHTML = `<span>${textOverride}</span>`;
+      if (extraClass) a.classList.add(...extraClass.split(" "));
+      return a;
+    }
+
+    wrap.innerHTML = "";
+
+    // Primary group: Marketplace (purple), Wallet (gold), Carbon Lab (green)
+    const g1 = document.createElement("div"); g1.className = "ghs-group";
+    const aMarket = cloneFor("marketplace.html","Marketplace","marketplace-link");
+    const aWallet = cloneFor("wallet.html","Wallet","wallet-link");
+    const aLab    = cloneFor("carbon-lab.html","Carbon Lab ✨","lab-link");
+    g1.appendChild(aMarket); g1.appendChild(aWallet); g1.appendChild(aLab);
+    wrap.appendChild(g1);
+
+    // Secondary group: the rest (Services → Contact), keep original menu order
+    const g2 = document.createElement("div"); g2.className = "ghs-group";
+    const preferred = new Set(["index.html","marketplace.html","wallet.html","carbon-lab.html","cart.html"]);
+    links.forEach(a => {
+      const key = normalizeHref(a.getAttribute("href"));
+      const label = (a.textContent || "").trim();
+      if (!key || preferred.has(key)) return;
+      // Include from Services to Contact (based on existing labels)
+      if (/^(services|knowledge|carbon program|token|partner|about|contact)/i.test(label)){
+        const c = a.cloneNode(true); c.removeAttribute("id");
+        g2.appendChild(c);
+      }
+    });
+    wrap.appendChild(g2);
+
+    // Final group: Cart with live count
+    const g3 = document.createElement("div"); g3.className = "ghs-group";
+    const aCart = cloneFor("cart.html", "Cart", "cart-link");
+    // badge
+    const b = document.createElement("span"); b.className = "badge"; b.id = "drawer-cart-badge"; b.textContent = String(cartCount());
+    aCart.appendChild(b);
+    g3.appendChild(aCart);
+    wrap.appendChild(g3);
+  }
+
+  // 4) Wire open/close and keep in sync
+  function setup(){
+    const btn = document.getElementById("menu-toggle");
+    const overlay = document.getElementById("ghs-overlay");
+    const panel = document.getElementById("ghs-offcanvas");
+    if (!btn || !overlay || !panel) return;
+
+    function open(){ rebuildDrawer(); panel.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow="hidden"; btn.setAttribute("aria-expanded","true"); }
+    function close(){ panel.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow=""; btn.setAttribute("aria-expanded","false"); }
+    function toggle(){ panel.classList.contains("open") ? close() : open(); }
+
+    if (!btn.__ghsBound){ btn.addEventListener("click", toggle); btn.__ghsBound = true; }
+    if (!overlay.__ghsBound){ overlay.addEventListener("click", close); overlay.__ghsBound = true; }
+    document.addEventListener("keydown", (e)=>{ if (e.key === "Escape") close(); });
+    // Keep in sync with header nav changes
+    const src = document.getElementById("main-menu") || document.querySelector(".menu");
+    if (src && !src.__obs){
+      src.__obs = new MutationObserver(()=>rebuildDrawer());
+      src.__obs.observe(src,{childList:true, subtree:true});
+    }
+  }
+
+  // 5) Update drawer cart badge whenever cart changes
+  const origRenderCartBadge = (typeof renderCartBadge === "function") ? renderCartBadge : null;
+  window.renderCartBadge = function(){
+    if (origRenderCartBadge) origRenderCartBadge();
+    const b = document.getElementById("drawer-cart-badge");
+    if (b) b.textContent = String((window.State && Array.isArray(State.cart)) ? State.cart.reduce((a,b)=>a+(b.qty||0),0) : 0);
+  };
+
+  // Bootstrap
+  function init(){
+    rebuildDrawer();
+    setup();
+    // also ensure Wallet & Lab styling markers are present in header links (for cloning)
+    try{
+      const nav = document.getElementById('main-menu') || document.querySelector('.menu');
+      if (nav){
+        nav.querySelectorAll('a').forEach(a=>{
+          const key = (a.getAttribute('href')||'').toLowerCase();
+          if (/wallet/.test(key)) a.classList.add('wallet-link');
+          if (/carbon-lab/.test(key)) a.classList.add('lab-link');
+          if (/marketplace/.test(key)) a.classList.add('marketplace-link');
+        });
+      }
+    }catch(e){}
+  }
+
+  if (document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", init); }
+  else { init(); }
+  setTimeout(init, 400); // late injections
+})();
