@@ -1,0 +1,49 @@
+/* === Hemp Swap Lab === */
+.lab-hero{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media (max-width: 900px){ .lab-hero{grid-template-columns:1fr} }
+
+.card{border:1px solid #eef2ef; background:#fff; border-radius:16px; padding:16px; box-shadow:0 12px 32px rgba(0,0,0,.06)}
+.card h2{margin:0 0 8px 0}
+.small{font-size:12px; opacity:.85}
+.grid{display:grid; gap:12px}
+.grid.cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.grid.cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
+@media (max-width: 900px){ .grid.cols-3{grid-template-columns:repeat(2, minmax(0,1fr))} }
+
+.inv-card{border:1px dashed #e3f7f1; border-radius:14px; padding:10px; background:linear-gradient(180deg,#f9fffc,#f7fbff); cursor:grab}
+.inv-card:active{cursor:grabbing}
+.inv-card .t{font-weight:700}
+.inv-card .s{font-size:12px; opacity:.8}
+.inv-card .img{height:120px; display:grid; place-items:center; border-radius:10px; background:#f0fffb; overflow:hidden}
+.inv-card img{width:100%; height:100%; object-fit:cover; display:block}
+
+.cauldron{position:relative; border:2px dashed #bfeee2; border-radius:20px; min-height:240px; background:repeating-linear-gradient(135deg, rgba(56,226,181,.06) 0 12px, rgba(0,0,0,0) 12px 24px)}
+.cauldron.drop{border-color:#38E2B5; box-shadow:0 0 0 4px rgba(56,226,181,.15) inset}
+.cauldron .inner{padding:16px}
+.cauldron .cta{opacity:.8; text-align:center; padding:24px}
+
+.kpis{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+.kpi{background:#0d1b16; color:#c8fff0; border-radius:12px; padding:12px; border:1px solid #143d31; box-shadow: inset 0 0 0 1px rgba(56,226,181,.15)}
+.kpi .label{font-size:12px; opacity:.85}
+.kpi .value{font-size:20px; font-weight:800}
+
+.badges{display:flex; gap:8px; flex-wrap:wrap}
+.badge{background:#eafff6; border:1px solid #b7f2e0; padding:4px 8px; border-radius:999px; font-size:12px}
+
+.actions-row{display:flex; gap:8px; flex-wrap:wrap}
+.btn{cursor:pointer}
+
+.assump{margin-top:10px}
+.assump table{width:100%; border-collapse:collapse}
+.assump th,.assump td{border-bottom:1px solid #eef2ef; padding:8px; text-align:left; font-size:13px}
+
+.toast{position:fixed; right:16px; bottom:16px; background:#0d1b16; color:#c8fff0; border:1px solid #143d31; border-radius:12px; padding:10px 14px; z-index:3000; display:none}
+.toast.show{display:block}
+
+.logo-badge{display:inline-block; width:10px; height:10px; background:#38E2B5; border-radius:2px; margin-right:6px}
+.hamburger{background:transparent; border:1px solid #e0f4ed; border-radius:10px; width:40px; height:40px}
+.hamburger span{display:block; width:18px; height:2px; background:#0b4b3f; margin:0 auto; position:relative; top:19px}
+.menu-panel{position:fixed; inset:0 40% 0 0; transform:translateX(-110%); transition:transform .2s ease; background:#fff; padding:16px; z-index:2000}
+.menu-panel.open{transform:translateX(0)}
+#menu-overlay{position:fixed; inset:0; background:rgba(0,0,0,.2); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:1500}
+#menu-overlay.open{opacity:1; pointer-events:auto}
