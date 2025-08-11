@@ -1,4 +1,4 @@
-/* === Hemp Swap Lab (scoped) === */
+/* === Hemp Swap Lab (bugfix + wetas float) === */
 (function(){
   function confettiBurst(x=window.innerWidth/2, y=window.innerHeight/2){
     const n=18, dur=900;
@@ -9,6 +9,22 @@
       const a={x:(Math.random()*2-1)*180, y:(Math.random()*-1-0.2)*240, r:(Math.random()*360)};
       s.animate([{transform:`translate(-50%,-50%) rotate(0deg)`},{transform:`translate(${a.x}px, ${a.y}px) rotate(${a.r}deg)`}],{duration:dur, easing:"cubic-bezier(.22,.61,.36,1)"}).onfinish=()=>s.remove();
     }
+  }
+
+  function flyWetas(n, fromEl){
+    try{
+      const badgeTarget = document.querySelector('a[href$="wallet.html"]') || document.querySelector("#cart-badge");
+      const srcRect = (fromEl || document.body).getBoundingClientRect();
+      const dstRect = badgeTarget ? badgeTarget.getBoundingClientRect() : {left: window.innerWidth-20, top: 10};
+      const el = document.createElement("div");
+      el.textContent = `+${n} WETAS`;
+      el.style.cssText = `position:fixed; left:${srcRect.left+srcRect.width/2}px; top:${srcRect.top}px; font-weight:900; z-index:3500; pointer-events:none; background:#0d1b16; color:#c8fff0; border:1px solid #143d31; border-radius:999px; padding:6px 10px; box-shadow:0 6px 20px rgba(0,0,0,.2);`;
+      document.body.appendChild(el);
+      el.animate([
+        { transform: `translate(0,0)`, opacity: 1 },
+        { transform: `translate(${dstRect.left - (srcRect.left+srcRect.width/2)}px, ${dstRect.top - srcRect.top}px) scale(.92)`, opacity: .1 }
+      ], { duration: 900, easing: "cubic-bezier(.22,.61,.36,1)" }).onfinish = ()=> el.remove();
+    }catch(e){}
   }
 
   const storage = (()=>{ try{ const k="__t"; localStorage.setItem(k,"1"); localStorage.removeItem(k);
@@ -51,6 +67,7 @@
   const sticky = q(".lab-page #sticky-cta");
   const stickyCO2 = q(".lab-page #sticky-co2");
   const stickyH2O = q(".lab-page #sticky-h2o");
+  const stickyBtn = q(".lab-page #sticky-add");
 
   function load(){ try{ const s=JSON.parse(storage.get(KEY)||"[]"); if(Array.isArray(s)) Lab.swaps=s; }catch(e){} }
   function save(){ try{ storage.set(KEY, JSON.stringify(Lab.swaps)); }catch(e){} }
@@ -103,6 +120,27 @@
     });
   }
 
+  function addToWallet(evt){
+    const t = currentTotals();
+    if (t.wetas <= 0){ toast("Make a swap first!"); return; }
+    try{
+      if (typeof State !== "undefined" && State.tokens && typeof saveState === "function"){
+        State.tokens.balance += t.wetas;
+        saveState();
+        const wb = document.getElementById("wallet-badge");
+        if (wb) wb.textContent = State.tokens.balance;
+      } else {
+        const key = "ghs_tokens_fallback";
+        const val = parseInt(storage.get(key)||"0",10);
+        storage.set(key, String(val + t.wetas));
+      }
+    }catch(e){}
+    toast(`Added ${t.wetas} WETAS to your wallet!`);
+    flyWetas(t.wetas, evt && evt.target);
+    confettiBurst();
+    resetLab();
+  }
+
   function addSwap(id, evt){
     const it = Items.find(x=>x.id===id);
     if(!it) return;
@@ -113,43 +151,24 @@
     setTimeout(()=>cauldron.classList.remove("drop"), 500);
     const savedCO2 = Math.max(0, it.co2e_base - it.co2e_hemp);
     const savedH2O = Math.max(0, it.water_base - it.water_hemp);
-    const last = q(".lab-page #result");
+    const last = document.querySelector(".lab-page #result");
     last.innerHTML = `<b>Swapped!</b> ${it.base} → <b>${it.hemp}</b> • Saved ${fmtKg(savedCO2)} CO₂e and ${fmtL(savedH2O)} water.`;
     if(navigator.vibrate) try{ navigator.vibrate(12); }catch(e){}
   }
 
   function dropHandler(e){ e.preventDefault(); const id = e.dataTransfer.getData("text/plain"); if(id) addSwap(id, e); }
-  function dragOver(e){ e.preventDefault(); }
 
-  function resetLab(){ Lab.swaps = []; save(); renderSwaps(); renderTotals(); q(".lab-page #result").textContent = "Lab reset."; }
-
-  function addToWallet(){
-    const t = currentTotals();
-    if (t.wetas <= 0){ toast("Make a swap first!"); return; }
-    try{
-      if (typeof State !== "undefined" && State.tokens && typeof saveState === "function"){
-        State.tokens.balance += t.wetas;
-        saveState();
-      } else {
-        const key = "ghs_tokens_fallback";
-        const val = parseInt(storage.get(key)||"0",10);
-        storage.set(key, String(val + t.wetas));
-      }
-    }catch(e){}
-    toast(`Added ${t.wetas} WETAS to your wallet!`);
-    confettiBurst();
-    resetLab();
-  }
+  function resetLab(){ Lab.swaps = []; save(); renderSwaps(); renderTotals(); document.querySelector(".lab-page #result").textContent = "Lab reset."; }
 
   function toast(msg){
-    const t = q(".lab-page #toast");
+    const t = document.querySelector(".lab-page #toast");
     t.textContent = msg;
     t.classList.add("show");
     setTimeout(()=>t.classList.remove("show"), 1600);
   }
 
   function renderAssumptions(){
-    const tbody = q(".lab-page #assump-rows");
+    const tbody = document.querySelector(".lab-page #assump-rows");
     if (!tbody) return;
     tbody.innerHTML = Items.map(it=>{
       const dC = Math.max(0, it.co2e_base - it.co2e_hemp).toFixed(1);
@@ -167,28 +186,8 @@
     }).join("");
   }
 
-  function spawnBubbles(){
-    const layer = q(".lab-page .bubbles");
-    if (!layer) return;
-    const count = 14;
-    layer.innerHTML = "";
-    for(let i=0; i<count; i++){
-      const b = document.createElement("span");
-      b.className = "bubble";
-      const left = Math.random()*92 + 4;
-      const size = 6 + Math.random()*10;
-      const dur = 3.5 + Math.random()*3.5;
-      const delay = Math.random()*3;
-      b.style.left = left + "%";
-      b.style.width = size + "px";
-      b.style.height = size + "px";
-      b.style.animation = `rise ${dur}s linear ${delay}s infinite`;
-      layer.appendChild(b);
-    }
-  }
-
   document.addEventListener("DOMContentLoaded", ()=>{
-    // Inventory
+    // Build inventory
     Items.forEach(it => {
       const c = document.createElement("div");
       c.className = "inv-card";
@@ -219,18 +218,39 @@
       inv.appendChild(c);
     });
 
-    // Load and render
+    // Render
     load(); renderSwaps(); renderTotals(); renderAssumptions();
 
-    // DnD + bubble layer
+    // Cauldron DnD
     cauldron.addEventListener("dragover", (e)=>{ e.preventDefault(); }, {passive:false});
     cauldron.addEventListener("drop", dropHandler);
-    spawnBubbles();
 
     // Buttons
-    document.getElementById("reset-lab").addEventListener("click", resetLab);
-    document.getElementById("add-wallet").addEventListener("click", addToWallet);
-    const stickyBtn = document.getElementById("sticky-add");
+    const mainAdd = document.getElementById("add-wallet");
+    if (mainAdd) mainAdd.addEventListener("click", addToWallet);
+    const resetBtn = document.getElementById("reset-lab");
+    if (resetBtn) resetBtn.addEventListener("click", resetLab);
     if (stickyBtn) stickyBtn.addEventListener("click", addToWallet);
+
+    // Bubbles
+    (function spawnBubbles(){
+      const layer = document.querySelector(".lab-page .bubbles");
+      if (!layer) return;
+      const count = 14;
+      layer.innerHTML = "";
+      for(let i=0; i<count; i++){
+        const b = document.createElement("span");
+        b.className = "bubble";
+        const left = Math.random()*92 + 4;
+        const size = 6 + Math.random()*10;
+        const dur = 3.5 + Math.random()*3.5;
+        const delay = Math.random()*3;
+        b.style.left = left + "%";
+        b.style.width = size + "px";
+        b.style.height = size + "px";
+        b.style.animation = `rise ${dur}s linear ${delay}s infinite`;
+        layer.appendChild(b);
+      }
+    })();
   });
 })();
