@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Hemp Swap Lab — Global Hemp Service</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="assets/css/style.css"/>
+  <link rel="stylesheet" href="assets/css/style.carbonlab.css"/>
+</head>
+<body>
+  <header>
+    <div id="menu-overlay"></div>
+    <div class="nav">
+      <div class="logo"><span class="logo-badge"></span> Global Hemp Service <span class="badge" id="geo-badge"></span></div>
+      <nav id="main-menu" class="menu menu-panel">
+        <a href="index.html">Home</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="services.html">Services</a>
+        <a href="knowledge.html">Knowledge</a>
+        <a href="carbon.html">Carbon Program</a>
+        <a href="token.html">Token Ecosystem</a>
+        <a href="partner.html">Partner with Us</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="wallet.html">Wallet</a>
+      </nav>
+      <div class="actions">
+        <a href="cart.html" class="btn ghost">Cart <span class="badge" id="cart-badge">0</span></a>
+        <button id="menu-toggle" class="hamburger" aria-label="Menu" aria-controls="main-menu" aria-expanded="false"><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="lab-hero">
+      <section class="card">
+        <h2>Hemp Swap Lab</h2>
+        <div class="small">Drag an item into the cauldron to swap to its hemp alternative. Save CO₂e, water, and earn WETAS.</div>
+        <div id="inv" class="grid cols-3" style="margin-top:10px"></div>
+        <div class="small" style="margin-top:8px; opacity:.7">Illustrative demo values. Toggle “Assumptions” below for details.</div>
+      </section>
+
+      <section class="card">
+        <h2>Swap Cauldron</h2>
+        <div id="cauldron" class="cauldron">
+          <div class="inner">
+            <div class="cta">Drop items here ✨</div>
+            <div id="result" class="small" style="margin-top:8px"></div>
+            <div class="kpis" style="margin-top:12px">
+              <div class="kpi"><div class="label">CO₂e saved</div><div class="value" id="total-co2">0.0 kg</div></div>
+              <div class="kpi"><div class="label">Water saved</div><div class="value" id="total-water">0 L</div></div>
+              <div class="kpi"><div class="label">WETAS (session)</div><div class="value" id="total-wetas">+0 WETAS</div></div>
+            </div>
+            <div class="badges" id="swap-list" style="margin-top:10px"></div>
+            <div class="actions-row" style="margin-top:12px">
+              <button class="btn" id="add-wallet">Add to wallet</button>
+              <button class="btn ghost" id="reset-lab">Reset lab</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card assump">
+      <details>
+        <summary><b>Assumptions</b> — open to see item-by-item demo numbers</summary>
+        <div class="small" style="margin:8px 0">Numbers are illustrative for demo purposes and may vary by supplier, distance, and process. We’ll wire precise datasets later.</div>
+        <div class="grid">
+          <table>
+            <thead>
+              <tr>
+                <th>Swap</th><th>Category</th>
+                <th>CO₂e base (kg)</th><th>CO₂e hemp (kg)</th><th>Δ CO₂e</th>
+                <th>Water base (L)</th><th>Water hemp (L)</th><th>Δ Water</th>
+              </tr>
+            </thead>
+            <tbody id="assump-rows"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container small">© 2025 Global Hemp Service — Demo.</div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="assets/js/app.js?v=2025-08-11-1" defer></script>
+  <script src="assets/js/carbon.lab.js?v=2025-08-11-1" defer></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", ()=>{ try{ setupMobileMenu && setupMobileMenu(); }catch(e){} });
+    try{ const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; const el = document.getElementById("geo-badge"); if(el) el.textContent = tz; }catch(e){}
+  </script>
+</body>
+</html>
