@@ -1,4 +1,4 @@
-/* === Hemp Swap Lab (mobile + flair) === */
+/* === Hemp Swap Lab (scoped) === */
 (function(){
   function confettiBurst(x=window.innerWidth/2, y=window.innerHeight/2){
     const n=18, dur=900;
@@ -40,16 +40,17 @@
   const Lab = { swaps: [] };
   const KEY = "ghs_lab_swaps";
 
-  const inv = document.getElementById("inv");
-  const cauldron = document.getElementById("cauldron");
-  const list = document.getElementById("swap-list");
-  const totalCO2 = document.getElementById("total-co2");
-  const totalWater = document.getElementById("total-water");
-  const totalWetas = document.getElementById("total-wetas");
+  function q(sel){ return document.querySelector(sel); }
+  const inv = q(".lab-page #inv");
+  const cauldron = q(".lab-page #cauldron");
+  const list = q(".lab-page #swap-list");
+  const totalCO2 = q(".lab-page #total-co2");
+  const totalWater = q(".lab-page #total-water");
+  const totalWetas = q(".lab-page #total-wetas");
 
-  const sticky = document.getElementById("sticky-cta");
-  const stickyCO2 = document.getElementById("sticky-co2");
-  const stickyH2O = document.getElementById("sticky-h2o");
+  const sticky = q(".lab-page #sticky-cta");
+  const stickyCO2 = q(".lab-page #sticky-co2");
+  const stickyH2O = q(".lab-page #sticky-h2o");
 
   function load(){ try{ const s=JSON.parse(storage.get(KEY)||"[]"); if(Array.isArray(s)) Lab.swaps=s; }catch(e){} }
   function save(){ try{ storage.set(KEY, JSON.stringify(Lab.swaps)); }catch(e){} }
@@ -112,7 +113,7 @@
     setTimeout(()=>cauldron.classList.remove("drop"), 500);
     const savedCO2 = Math.max(0, it.co2e_base - it.co2e_hemp);
     const savedH2O = Math.max(0, it.water_base - it.water_hemp);
-    const last = document.getElementById("result");
+    const last = q(".lab-page #result");
     last.innerHTML = `<b>Swapped!</b> ${it.base} → <b>${it.hemp}</b> • Saved ${fmtKg(savedCO2)} CO₂e and ${fmtL(savedH2O)} water.`;
     if(navigator.vibrate) try{ navigator.vibrate(12); }catch(e){}
   }
@@ -120,7 +121,7 @@
   function dropHandler(e){ e.preventDefault(); const id = e.dataTransfer.getData("text/plain"); if(id) addSwap(id, e); }
   function dragOver(e){ e.preventDefault(); }
 
-  function resetLab(){ Lab.swaps = []; save(); renderSwaps(); renderTotals(); document.getElementById("result").textContent = "Lab reset."; }
+  function resetLab(){ Lab.swaps = []; save(); renderSwaps(); renderTotals(); q(".lab-page #result").textContent = "Lab reset."; }
 
   function addToWallet(){
     const t = currentTotals();
@@ -141,14 +142,14 @@
   }
 
   function toast(msg){
-    const t = document.getElementById("toast");
+    const t = q(".lab-page #toast");
     t.textContent = msg;
     t.classList.add("show");
     setTimeout(()=>t.classList.remove("show"), 1600);
   }
 
   function renderAssumptions(){
-    const tbody = document.getElementById("assump-rows");
+    const tbody = q(".lab-page #assump-rows");
     if (!tbody) return;
     tbody.innerHTML = Items.map(it=>{
       const dC = Math.max(0, it.co2e_base - it.co2e_hemp).toFixed(1);
@@ -167,7 +168,7 @@
   }
 
   function spawnBubbles(){
-    const layer = document.querySelector(".bubbles");
+    const layer = q(".lab-page .bubbles");
     if (!layer) return;
     const count = 14;
     layer.innerHTML = "";
@@ -188,7 +189,6 @@
 
   document.addEventListener("DOMContentLoaded", ()=>{
     // Inventory
-    const inv = document.getElementById("inv");
     Items.forEach(it => {
       const c = document.createElement("div");
       c.className = "inv-card";
@@ -223,7 +223,6 @@
     load(); renderSwaps(); renderTotals(); renderAssumptions();
 
     // DnD + bubble layer
-    const cauldron = document.getElementById("cauldron");
     cauldron.addEventListener("dragover", (e)=>{ e.preventDefault(); }, {passive:false});
     cauldron.addEventListener("drop", dropHandler);
     spawnBubbles();
