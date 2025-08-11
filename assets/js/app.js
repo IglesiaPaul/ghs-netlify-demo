@@ -106,27 +106,47 @@ function currency(n) {
   return new Intl.NumberFormat(undefined, { style: "currency", currency: "EUR" }).format(n);
 }
 
-function renderProducts(target = "#product-grid") {
-  const grid = document.querySelector(target);
-  if (!grid) return;
-  grid.innerHTML = "";
-  for (const p of Catalog) {
-    const card = document.createElement("div");
-    card.className = "product";
-    card.setAttribute("data-id", String(p.id));
-    card.innerHTML = `
-      <a href="product.html?id=${p.id}" aria-label="View ${p.name}">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" width="800" height="600"/>
-      </a>
-      <div class="p-body">
-        <div class="tag">${p.vendor}</div>
-        <h4><a href="product.html?id=${p.id}">${p.name}</a></h4>
-        <div class="price">${currency(p.price).replace(/\u00a0/g,' ')}</div>
-        <button class="btn" data-add="${p.id}">Add to cart</button>
-      </div>
-    `;
-    grid.appendChild(card);
+/* === Unified product renderer (home hero cards) === */
+function renderProducts(containerId, items) {
+  const el = document.getElementById(containerId) || document.querySelector(containerId);
+  if (!el) return;
+
+  // If your grid container is INSIDE a <section class="home-hero"> wrapper,
+  // leave this as-is. (See Step 4 below.)
+  if (!el.classList.contains('grid')) {
+    el.classList.add('grid');
   }
+
+  el.innerHTML = (items || []).map(p => {
+    const price = (p.price != null) ? Number(p.price).toFixed(2) : "";
+    const brand = p.brand || p.company || "";
+    const category = p.category || "";
+    const img = p.image || p.img || "";
+    const imgSrc = img.startsWith("assets/") ? img : ("assets/img/products/" + img);
+    const viewHref = "product.html?id=" + encodeURIComponent(p.id);
+
+    return `
+    <article class="p-card" data-id="${p.id}" tabindex="0">
+      <div class="p-media">
+        <img src="${imgSrc}" alt="${p.name}" loading="lazy" width="400" height="300"/>
+        ${brand ? `<span class="p-badge">${brand}</span>` : ``}
+      </div>
+      <div class="p-body">
+        <h3 class="p-title">${p.name}</h3>
+        ${category ? `<div class="p-meta"><span class="p-tag">${category}</span></div>` : `<div class="p-meta"></div>`}
+        ${p.desc ? `<div class="p-desc">${p.desc}</div>` : ``}
+        <div class="p-actions">
+          <a class="p-link" href="${viewHref}" aria-label="View ${p.name}">View</a>
+          <button class="p-add" data-add="${p.id}" aria-label="Add ${p.name} to cart">${price ? `Add • $${price}` : `Add to cart`}</button>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+
+  // Re-run hero micro-interactions if the page script listens to DOMContentLoaded
+  try { if (window.dispatchEvent) window.dispatchEvent(new Event("DOMContentLoaded")); } catch(e){}
+}
+
   // Delegate add-to-cart buttons
   grid.querySelectorAll("button[data-add]").forEach(btn => {
     btn.addEventListener("click", (e) => {
