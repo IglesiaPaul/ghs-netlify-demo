@@ -36,16 +36,16 @@
     <div class="lab-hero">
       <section class="card">
         <h2>Hemp Swap Lab</h2>
-        <div class="small">Drag an item into the cauldron to swap to its hemp alternative. Save CO₂e, water, and earn WETAS.</div>
+        <div class="small">Drag an item into the cauldron — or just <b>tap “Add”</b> on mobile — to swap to its hemp alternative. Save CO₂e, water, and earn WETAS.</div>
         <div id="inv" class="grid cols-3" style="margin-top:10px"></div>
         <div class="small" style="margin-top:8px; opacity:.7">Illustrative demo values. Toggle “Assumptions” below for details.</div>
       </section>
 
       <section class="card">
         <h2>Swap Cauldron</h2>
-        <div id="cauldron" class="cauldron">
+        <div id="cauldron" class="cauldron" aria-label="Swap target zone">
           <div class="inner">
-            <div class="cta">Drop items here ✨</div>
+            <div class="cta">Drop items here ✨ (or tap Add)</div>
             <div id="result" class="small" style="margin-top:8px"></div>
             <div class="kpis" style="margin-top:12px">
               <div class="kpi"><div class="label">CO₂e saved</div><div class="value" id="total-co2">0.0 kg</div></div>
@@ -88,8 +88,8 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="assets/js/app.js?v=2025-08-11-1" defer></script>
-  <script src="assets/js/carbon.lab.js?v=2025-08-11-1" defer></script>
+  <script src="assets/js/app.js?v=2025-08-11-2" defer></script>
+  <script src="assets/js/carbon.lab.js?v=2025-08-11-2" defer></script>
   <script>
     document.addEventListener("DOMContentLoaded", ()=>{ try{ setupMobileMenu && setupMobileMenu(); }catch(e){} });
     try{ const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; const el = document.getElementById("geo-badge"); if(el) el.textContent = tz; }catch(e){}
