@@ -1,8 +1,4 @@
-/* === Carbon Lab JS patch (v2025-08-11-6) ===
-   - Fix toast() selector so it doesn't crash when #toast is not inside .lab-page
-   - Guard all optional nodes so addToWallet() always runs
-   - Keep fly-to-wallet animation
-*/
+/* === Carbon Lab JS (safe selectors + WETAS fly) — v2025-08-11-6 === */
 (function(){
   function confettiBurst(x=window.innerWidth/2, y=window.innerHeight/2){
     const n=18, dur=900;
