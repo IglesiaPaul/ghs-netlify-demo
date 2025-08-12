@@ -13,6 +13,8 @@
     document.querySelectorAll('.cta-btn').forEach(b=>{
       b.style.position = 'relative';
       b.addEventListener('click', ripple);
+      const href=(b.getAttribute('href')||'').trim();
+      if(href==='#' || b.hasAttribute('data-dead')){ b.addEventListener('click', e=>e.preventDefault()); }
     });
   }
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
