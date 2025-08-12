@@ -119,25 +119,13 @@ const TokenRules = { Apparel: 2, Food: 3, Construction: 8, Wellness: 2, Accessor
 State.products = Catalog;
 
 /* --------------- Cart + Wallet --------------- */
+
 function addToCart(id) {
   const p = Catalog.find((x) => x.id === id);
   if (!p) return;
   const found = State.cart.find((x) => x.id === id);
   if (found) found.qty += 1;
-  else State.cart.push({ ...p, qty: 1 });
-  saveState();
-  renderCartBadge();
-  if (navigator.vibrate) try { navigator.vibrate(16); } catch(e){}
-  if (typeof window.toast === 'function') toast(`Added to cart: ${p.name}`);
-}
-);
-  saveState();
-  renderCartBadge();
-  // Small haptic/feedback on mobile
-  if (navigator.vibrate) try { navigator.vibrate(16); } catch(e){}
-  alert(`Added to cart: ${p.name}`);
-}
-function renderCartBadge() {
+  else State.cart.push({ ...p, qty: 1 }function renderCartBadge() {
   const n = State.cart.reduce((a, b) => a + b.qty, 0);
   const el = document.querySelector("#cart-badge");
   if (el) el.textContent = n;
@@ -151,22 +139,53 @@ function currency(n) {
 }
 
 /* === Unified product renderer (home + marketplace cards) === */
+
 function renderProducts(containerId, items) {
   const el = document.getElementById(containerId) || document.querySelector(containerId);
   if (!el) return;
-
   if (!el.classList.contains('grid')) el.classList.add('grid');
 
-  el.innerHTML = (items || []).map(p => {
-    const price = (p.price != null) ? Number(p.price) : null;
+  const list = Array.isArray(items) ? items : (window.State && Array.isArray(State.products) ? State.products : []);
+
+  el.innerHTML = list.map(p => {
     const brand = p.brand || p.vendor || p.company || "";
     const category = p.category || "";
     const img = p.image || p.img || p.thumbnail || "";
-    const imgSrc = img.startsWith("assets/") ? img : ("assets/img/products/" + img);
+    const imgSrc = /^assets\//.test(img) ? img : ("assets/img/products/" + img);
     const viewHref = "product.html?id=" + encodeURIComponent(p.id);
-
     return `
     <article class="p-card" data-id="${p.id}" tabindex="0">
+      <div class="p-media">
+        <img src="${imgSrc}" alt="${p.name}" loading="lazy" width="400" height="300"/>
+        ${brand ? `<span class="p-badge">${brand}</span>` : ``}
+      </div>
+      <div class="p-body">
+        <h3 class="p-title">${p.name}</h3>
+        ${category ? `<div class="p-meta"><span class="p-tag">${category}</span></div>` : `<div class="p-meta"></div>`}
+        ${p.desc ? `<div class="p-desc">${p.desc}</div>` : ``}
+        <div class="p-actions">
+          <a class="p-link" href="${viewHref}" aria-label="View ${p.name}">View</a>
+          <button class="p-add" data-add="${p.id}" aria-label="Get ${p.name} now">Get it</button>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+
+  // Event delegation for add buttons (bind once, capture phase to avoid duplicates)
+  if (!el.__ghsAddBound){
+    el.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-add]");
+      if (!btn || !el.contains(btn)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      const id = parseInt(btn.getAttribute("data-add"), 10);
+      if (!isNaN(id)) addToCart(id);
+    }, true); // capture
+    el.__ghsAddBound = true;
+  }
+}
+" tabindex="0">
       <div class="p-media">
         <img src="${imgSrc}" alt="${p.name}" loading="lazy" width="400" height="300"/>
         ${brand ? `<span class="p-badge">${brand}</span>` : ``}
