@@ -1,0 +1,26 @@
+/* === Marketplace Hero (purple twist) ======================================= */
+.mp-hero{
+  position: relative;
+  margin: 16px 0 18px;
+  padding: 26px 22px;
+  background: linear-gradient(180deg, #fbf8ff 0%, #ffffff 100%);
+  border: 1px solid #e7dbff;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(122,60,255,.08);
+  overflow: hidden;
+}
+.mp-hero::before{
+  content:"";
+  position:absolute; inset:-10% -10% 40% -10%;
+  background:
+    radial-gradient(260px 180px at 20% -10%, rgba(122,60,255,.20), transparent 70%),
+    radial-gradient(240px 200px at 80% 30%, rgba(184,151,255,.18), transparent 70%);
+  filter: blur(6px); pointer-events:none;
+}
+.mp-hero h1{ margin:0 0 6px; color:#2b1b4f; }
+.mp-hero .lead{ margin:0; color:#5a4a77; }
+@media (max-width: 900px){
+  .mp-hero{ padding: 20px 16px; border-radius: 16px; }
+}
+/* little purple divider before the filter row */
+.mp-hero + .grid.cols-3{ margin-top: 10px; }
