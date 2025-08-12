@@ -4,10 +4,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Marketplace — Global Hemp Service</title>
-  <!-- Base styles -->
   <link rel="stylesheet" href="assets/css/style.css"/>
   <link rel="stylesheet" href="assets/css/style.homehero.css"/>
-  <!-- Purple theme override -->
   <link rel="stylesheet" href="assets/css/theme.marketplace.purple.css"/>
   <link rel="icon" href="data:,">
 </head>
@@ -41,14 +39,12 @@
       <p class="small">Browse hemp-forward products across brands and categories.</p>
     </header>
 
-    <!-- Optional filter row -->
     <div class="grid cols-3" style="margin-bottom:10px">
       <div class="card"><b>Category</b><br/><span class="small">All</span></div>
       <div class="card"><b>Brand</b><br/><span class="small">All</span></div>
       <div class="card"><b>Sort</b><br/><span class="small">Relevance</span></div>
     </div>
 
-    <!-- Product grid target -->
     <section class="home-hero">
       <div id="market-grid" class="grid"></div>
     </section>
@@ -58,22 +54,10 @@
     <div class="container small">© 2025 Global Hemp Service — Demo.</div>
   </footer>
 
-  <!-- Timezone badge fill (non-blocking) -->
   <script>try{const tz=Intl.DateTimeFormat().resolvedOptions().timeZone;const el=document.getElementById("geo-badge");if(el)el.textContent=tz;}catch(e){}</script>
-  <!-- Core scripts -->
   <script src="assets/js/app.js?v=2025-08-12-6" defer></script>
   <script src="assets/js/brand.header.js" defer></script>
-  <!-- Optional: new CTA label without price -->
   <script src="assets/js/card.cta.override.js" defer></script>
-  <!-- Safety net: force-render if some auto-init was removed -->
-  <script defer>
-    window.addEventListener('DOMContentLoaded', function(){
-      var grid = document.getElementById('market-grid');
-      if (grid && typeof window.renderProducts === 'function') {
-        var list = (window.State && Array.isArray(State.products)) ? State.products : [];
-        if (!grid.querySelector('.p-card')) window.renderProducts('market-grid', list);
-      }
-    });
-  </script>
+  <script src="assets/js/market.force.js" defer></script>
 </body>
 </html>
