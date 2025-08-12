@@ -5,14 +5,13 @@
 .container{ max-width: var(--container); margin: 0 auto; padding: 0 16px; }
 
 .teaser{ position: relative; overflow: hidden; color: #0b1a15; }
-.teaser .inner{ position: relative; z-index: 2; padding: 64px 0; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; align-items: center; }
+tpx clamp(24px, 5vw, 56px); display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; align-items: center; }
 .teaser h1, .teaser h2{ margin: 0; line-height: 1.1; }
 .teaser .lead{ font-size: 18px; opacity: .9; max-width: 60ch; }
-.teaser .cta-row{ display:flex; gap:12px; align-items:center; margin-top:18px; }
+.teaser .cta-row{ display:flex; gap:12px; align-items:center; margin-top:18px;  flex-wrap: wrap; }
 
 /* Mobile */
-@media (max-width: 900px){
-  .teaser .inner{ grid-template-columns: 1fr; padding: 40px 0; }
+`px clamp(18px, 6vw, 28px); }
 }
 
 /* Background blob animation */
@@ -37,9 +36,9 @@
 
 /* Illustrations (placeholder shapes) */
 .teaser .art{
-  min-height: 260px; border-radius: 18px; position: relative; overflow:hidden; background: rgba(255,255,255,.5);
+  min-height: 320px; border-radius: 18px; position: relative; overflow:hidden; background: rgba(255,255,255,.5);
   border: 1px solid rgba(0,0,0,.06); box-shadow: 0 20px 50px rgba(0,0,0,.08) inset, 0 10px 30px rgba(0,0,0,.06);
-}
+ aspect-ratio: 16/10; }
 .teaser .art::after{
   content:""; position:absolute; inset:0;
   background:
@@ -81,8 +80,8 @@
 .teaser .inner{ grid-template-columns: minmax(320px, 640px) 1fr; }
 .teaser .inner > div:first-child{ max-width: 640px; }
 /* Anchor the art to the right and give it a consistent visual width */
-.teaser .art{ justify-self: end; width: min(620px, 45vw); }
-@media (max-width: 1200px){ .teaser .art{ width: min(560px, 52vw); } }
-@media (max-width: 900px){ .teaser .art{ width: 100%; justify-self: stretch; } }
+.teaser .art{ justify-self: end; width: min(620px, 45vw);  aspect-ratio: 16/10; }
+@media (max-width: 1200px){ .teaser .art{ width: min(560px, 52vw);  aspect-ratio: 16/10; } }
+@media (max-width: 900px){ .teaser .art{ width: 100%; justify-self: stretch;  aspect-ratio: 16/10; } }
 /* Ensure wallet section uses the same rules explicitly */
 .teaser.wallet .art{ justify-self: end; }
