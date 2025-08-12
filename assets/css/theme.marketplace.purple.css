@@ -1,0 +1,41 @@
+/* === Marketplace Purple Theme (override) ================================ */
+/* Palette */
+:root{
+  --mp-accent: #7a3cff;   /* primary purple */
+  --mp-accent-2: #b897ff; /* soft purple */
+  --mp-ink: #2b1b4f;      /* headings */
+  --mp-ink-weak: #5a4a77; /* body text */
+}
+
+/* Page accent (optional background tint) */
+body.marketplace-theme{ background: linear-gradient(180deg, #fbf8ff 0%, #ffffff 120%); }
+
+/* Card tweaks */
+.home-hero .p-card{ box-shadow: 0 10px 28px rgba(66, 36, 112, .08); }
+.home-hero .p-card:focus-within{ outline-color: var(--mp-accent); }
+
+/* Brand badge on image */
+.home-hero .p-badge{
+  background:#201433; color:#efe8ff; border:1px solid #3d2a67;
+}
+
+/* Title + copy */
+.home-hero .p-title{ color: var(--mp-ink); }
+.home-hero .p-desc{ color: var(--mp-ink-weak); }
+
+/* Price + meta */
+.home-hero .p-price{ color:#4c2bd9; }
+.home-hero .p-tag{ background:#f6f0ff; border:1px solid #e0d8ff; color:#4a338f; }
+
+/* Buttons */
+.home-hero .p-link{
+  border-color:#e7dbff; color:#5b3fd3; background:#fff;
+}
+.home-hero .p-link:hover{ background:#f6f0ff; }
+.home-hero .p-add{
+  border-color:#e7dbff; background: linear-gradient(180deg, #7a3cff, #6a2be8); color:#fff;
+}
+.home-hero .p-add:hover{ filter: brightness(1.05); }
+
+/* Hover lift has a touch more drama on purple */
+.home-hero .p-card:hover{ box-shadow: 0 16px 40px rgba(66, 36, 112, .16); }
