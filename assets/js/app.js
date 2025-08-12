@@ -650,3 +650,65 @@ a.cart-link .badge{ background:#0d1b16; color:#c8fff0; border:1px solid #143d31;
   else { init(); }
   setTimeout(init, 400); // late injections
 })();
+
+/* --------------- Header Drawer (desktop & mobile) -------------------- */
+(function(){
+  if (window.__ghsDrawerInit) return; window.__ghsDrawerInit = true;
+
+  // Inject drawer CSS once
+  if (!document.getElementById('ghs-drawer-style')){
+    const s = document.createElement('style'); s.id='ghs-drawer-style';
+    s.textContent = `
+      /* off-canvas using the existing #main-menu */
+      #main-menu.menu-panel{
+        position: fixed; inset: 0 auto 0 0; width: min(86vw, 360px);
+        transform: translateX(-100%); transition: transform .2s ease;
+        background:#fff; z-index:4000; overflow:auto; padding:16px;
+        box-shadow: 8px 0 30px rgba(0,0,0,.1);
+      }
+      body.drawer-open #main-menu.menu-panel{ transform: translateX(0); }
+
+      /* overlay */
+      #ghs-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.32); z-index:3990; display:none; }
+      body.drawer-open #ghs-overlay{ display:block; }
+
+      /* hide inline menu at desktop so only burger is visible */
+      @media (min-width: 900px){
+        .nav > .menu{ position: static; transform:none !important; width:auto; display:none; }
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
+  function ensureOverlay(){
+    let ov = document.getElementById('ghs-overlay');
+    if (!ov){
+      ov = document.createElement('div'); ov.id = 'ghs-overlay';
+      document.body.appendChild(ov);
+      ov.addEventListener('click', close);
+    }
+    return ov;
+  }
+  function open(){ document.body.classList.add('drawer-open'); }
+  function close(){ document.body.classList.remove('drawer-open'); }
+  function toggle(){ document.body.classList.toggle('drawer-open'); }
+
+  function bind(){
+    const btn = document.getElementById('menu-toggle');
+    const menu = document.getElementById('main-menu');
+    if (!btn || !menu) return;
+    ensureOverlay();
+    if (!btn.__ghsBound){
+      btn.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        toggle();
+      }, true); // capture to beat any other menu listeners
+      btn.__ghsBound = true;
+    }
+    // ESC to close
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') close(); });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+  else bind();
+})();
