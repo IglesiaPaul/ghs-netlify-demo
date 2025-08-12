@@ -1,2 +1,41 @@
+<header class="site-header">
+  <div class="container" style="display:flex;align-items:center;gap:16px;justify-content:space-between;height:64px">
+    <a href="/" class="logo" style="font-weight:800;text-decoration:none;color:var(--ink-900)">Global Hemp Service</a>
+    <button id="navToggle" aria-label="Toggle menu" style="background:none;border:0;font-size:24px;line-height:1">☰</button>
+    <nav id="nav" style="display:none">
+      <ul style="list-style:none;display:flex;gap:20px;margin:0;padding:0">
+        <li><a href="/">Home</a></li>
+        <li><a href="/marketplace">Marketplace</a></li>
+        <li><a href="/services">Services</a></li>
+        <li><a href="/knowledge">Knowledge</a></li>
+        <li><a href="/carbon">Carbon Program</a></li>
+        <li><a href="/token">Token Ecosystem</a></li>
+        <li><a href="/partner">Partner with Us</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/cart">Cart <span class="badge">0</span></a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<script>
+  (function(){
+    const nav = document.getElementById('nav');
+    const btn = document.getElementById('navToggle');
+    function setMode(){
+      nav.style.display = window.matchMedia('(min-width: 900px)').matches ? 'block' : 'none';
+    }
+    if(btn){ btn.addEventListener('click', ()=>{
+      nav.style.display = (nav.style.display==='none' || nav.style.display==='') ? 'block' : 'none';
+    });}
+    window.addEventListener('resize', setMode); setMode();
 
-/
+    // highlight active link
+    const here = location.pathname.replace(/\/$/, '') || '/';
+    document.querySelectorAll('nav a').forEach(a=>{
+      const path = new URL(a.getAttribute('href'), location.origin).pathname.replace(/\/$/, '') || '/';
+      if(path===here){ a.style.fontWeight='700'; a.style.textDecoration='underline'; }
+    });
+  })();
+</script>
