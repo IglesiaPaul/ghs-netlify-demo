@@ -29,6 +29,40 @@ const storage = (() => {
   }
 })();
 
+
+/* --------------- Toast helper (non-blocking feedback) --------------- */
+(function(){
+  if (window.__ghsToastInit) return; window.__ghsToastInit = true;
+  if (!document.getElementById('ghs-toast-style')){
+    const s = document.createElement('style'); s.id='ghs-toast-style';
+    s.textContent = `
+      #ghs-toast{ position:fixed; right:16px; bottom:16px; z-index:5000;
+                  background:#0b1a15; color:#c8fff0; border:1px solid #143d31;
+                  padding:10px 12px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,.25);
+                  display:flex; align-items:center; gap:10px; transform: translateY(8px); opacity:0;
+                  transition: opacity .18s, transform .18s; }
+      #ghs-toast.show{ opacity:1; transform: translateY(0); }
+      #ghs-toast .btn{ background:#eafff6; color:#0b7c3f; border:1px solid #b2e8d9; border-radius:10px; padding:6px 10px; cursor:pointer; }
+    `;
+    document.head.appendChild(s);
+  }
+  window.toast = function(msg, opts){
+    let t = document.getElementById('ghs-toast');
+    if (!t){
+      t = document.createElement('div'); t.id='ghs-toast';
+      t.innerHTML = `<span id="ghs-toast-msg"></span> <button class="btn" id="ghs-toast-ok">OK</button>`;
+      document.body.appendChild(t);
+      t.querySelector('#ghs-toast-ok').addEventListener('click', ()=>{ t.classList.remove('show'); clearTimeout(t.__timer); });
+    }
+    t.querySelector('#ghs-toast-msg').textContent = msg || 'Done';
+    requestAnimationFrame(()=> t.classList.add('show'));
+    clearTimeout(t.__timer);
+    const dur = (opts && opts.duration) || 2200;
+    t.__timer = setTimeout(()=> t.classList.remove('show'), dur);
+    return t;
+  };
+})();
+
 /* --------------- Keys & Defaults --------------- */
 const STORAGE = { cart: "ghs_cart", tokens: "ghs_tokens" };
 const DefaultTokens = { balance: 120, tier: "Green" };
@@ -67,7 +101,7 @@ function resetDemo() {
   State.tokens = { ...DefaultTokens };
   saveState();
   renderCartBadge();
-  alert("Demo reset. Cart cleared and WETAS set to default.");
+  if (typeof toast==='function') toast('Demo reset. Cart cleared and WETAS set to default.');
   if (document.querySelector("#cart-table")) renderCartPage();
   if (document.querySelector("#token-balance")) renderWallet();
 }
@@ -91,6 +125,12 @@ function addToCart(id) {
   const found = State.cart.find((x) => x.id === id);
   if (found) found.qty += 1;
   else State.cart.push({ ...p, qty: 1 });
+  saveState();
+  renderCartBadge();
+  if (navigator.vibrate) try { navigator.vibrate(16); } catch(e){}
+  if (typeof window.toast === 'function') toast(`Added to cart: ${p.name}`);
+}
+);
   saveState();
   renderCartBadge();
   // Small haptic/feedback on mobile
@@ -137,7 +177,7 @@ function renderProducts(containerId, items) {
         ${p.desc ? `<div class="p-desc">${p.desc}</div>` : ``}
         <div class="p-actions">
           <a class="p-link" href="${viewHref}" aria-label="View ${p.name}">View</a>
-          <button class="p-add" data-add="${p.id}" aria-label="Add ${p.name} to cart">${price != null ? `Add • ${currency(price)}` : `Add to cart`}</button>
+          \1Get it\3
         </div>
       </div>
     </article>`;
@@ -179,7 +219,7 @@ function checkout() {
   State.cart = [];
   saveState();
   renderCartBadge();
-  alert(`Checkout simulated!\nWETAS earned: ${tokensEarned}`);
+  if (typeof toast==='function') toast(`Checkout simulated! WETAS earned: ${tokensEarned}`, {duration:1800});
   window.location.href = "wallet.html";
 }
 function renderWallet() {
