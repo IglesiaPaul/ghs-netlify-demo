@@ -1,0 +1,101 @@
+/* === Product Page Purple Theme (colors only) ===============================
+   Drop this AFTER your existing style.css. It only changes colors/visuals,
+   NOT sizes, spacing, or border-radius. Keeps WETAS section green.
+============================================================================= */
+
+/* Page background */
+body.product, body.product-page, body.product-bg, body.product_single, body#product {
+  background: #fbf8ff; /* light purple */
+}
+
+/* Pills / badges */
+.pill, .badge, .chip, .tag, .p-tag {
+  border-color: #e2d5ff !important;
+  color: #4b1bb3 !important;          /* deep purple text */
+  background: #efe6ff !important;     /* soft purple bg */
+}
+
+/* Secondary / soft pill variant if you use .soft */
+.pill.soft, .tag.soft {
+  background: #ffffff !important;
+  color: #4b1bb3 !important;
+  border-color: #e2d5ff !important;
+}
+
+/* Primary call-to-action buttons (no size changes) */
+.btn.primary, .btn.primary.purple, .btn.cta {
+  background: linear-gradient(180deg, #7a3cff, #4b1bb3) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+/* Ghost buttons in purple family */
+.btn.ghost.purple, .btn.ghost.market, .btn.outline.purple {
+  background: #ffffff !important;
+  color: #4b1bb3 !important;
+  border-color: #e2d5ff !important;
+}
+
+/* Regular links or underlined chips, keep purple tone */
+a, .link, .pill a, .pill.link {
+  color: #4b1bb3;
+}
+
+/* Headings tint slightly darker */
+h1, h2, h3, .title {
+  color: #2b105a; /* deep purple ink */
+}
+
+/* Cards subtle purple shadow without changing radius/padding */
+.card, .panel, .box {
+  box-shadow: 0 10px 28px rgba(122, 60, 255, 0.08) !important;
+  border-color: #e9e6f3 !important;
+}
+
+/* Category label near the View button often uses .p-meta or .p-tag */
+.p-meta .p-tag, .category, .category-pill {
+  background: #efe6ff !important;
+  color: #4b1bb3 !important;
+  border-color: #e2d5ff !important;
+}
+
+/* Keep WETAS section GREEN (color-only overrides) */
+.wetas, section.wetas, [data-section="wetas"] {
+  background: #ffffff;              /* keep white card */
+  border-color: #d2f5e7 !important; /* greenish border */
+  box-shadow: 0 10px 28px rgba(11,124,63,0.08) !important;
+}
+.wetas h2, .wetas .k, .wetas header h2 {
+  color: #0a6b37 !important;
+}
+.wetas .chip, .wetas .badge, .wetas .pill {
+  background: #eafff2 !important;
+  color: #0a6b37 !important;
+  border-color: #bfead2 !important;
+}
+.wetas a.btn, .wetas .btn.green, .wetas .btn.primary.green {
+  background: linear-gradient(180deg, #24b574, #0a6b37) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+.wetas .btn.green.ghost, .wetas .btn.ghost.green {
+  background: #ffffff !important;
+  color: #0a6b37 !important;
+  border-color: #bfead2 !important;
+}
+
+/* Preserve cart badge styling but bring slight purple */
+#cart-badge, #drawer-cart-badge {
+  background: #7a3cff !important;
+  color: #ffffff !important;
+}
+
+/* Ensure "Get it" button text visible if inheriting */
+button.p-add, .btn.get-it {
+  color: #ffffff !important;
+}
+
+/* Keep any previously green accents in wallet/lab untouched by scoping */
+.wallet *, .carbon-lab * {
+  /* no overrides here */
+}
