@@ -34,3 +34,10 @@ body.drawer-open #menu-overlay{ display: block; }
 /* Minor polish for links inside drawer */
 #main-menu a{ display:block; padding:10px 8px; border-radius:10px; text-decoration:none; color:#222; }
 #main-menu a:hover{ background:#f5f7f6; }
+
+/* Drawer (off-canvas) – active link highlight */
+#ghs-offcanvas .ghs-menu a.active {
+  background: #f5f0ff;     /* subtle purple */
+  border-color: #e2d5ff;   /* optional, if your links have borders */
+  color: #4b1bb3;          /* purple text to match theme */
+}
