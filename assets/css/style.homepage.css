@@ -1,5 +1,5 @@
 /* === Homepage Teasers ===================================================== */
-:root{ --gutter-desktop: clamp(28px, 6vw, 72px); --gutter-mobile: clamp(18px, 5vw, 28px); --art-h-desktop: 320px; --art-h-mobile: 240px; 
+:root{
   --container: 1100px;
 }
 .container{ max-width: var(--container); margin: 0 auto; padding: 0 16px; }
@@ -8,7 +8,7 @@
 .teaser .inner{ position: relative; z-index: 2; padding: 64px 0; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; align-items: center; }
 .teaser h1, .teaser h2{ margin: 0; line-height: 1.1; }
 .teaser .lead{ font-size: 18px; opacity: .9; max-width: 60ch; }
-.teaser .cta-row{ display:flex; gap:12px; align-items:center; margin-top:18px;  flex-wrap: wrap; }
+.teaser .cta-row{ display:flex; gap:12px; align-items:center; margin-top:18px; }
 
 /* Mobile */
 @media (max-width: 900px){
@@ -36,8 +36,8 @@
 .teaser.wallet{ --bg:#fffaf0; --accent:#ffd86b; --accent2:#ffe8b3; --blob1: rgba(255,216,107,.25); --blob2: rgba(255,232,179,.22); --swirl: rgba(255,216,107,.12); background: var(--bg); }
 
 /* Illustrations (placeholder shapes) */
-.teaser .art{ min-height: var(--art-h-desktop); aspect-ratio: 16/10;
-   border-radius: 18px; position: relative; overflow:hidden; background: rgba(255,255,255,.5);
+.teaser .art{
+  min-height: 260px; border-radius: 18px; position: relative; overflow:hidden; background: rgba(255,255,255,.5);
   border: 1px solid rgba(0,0,0,.06); box-shadow: 0 20px 50px rgba(0,0,0,.08) inset, 0 10px 30px rgba(0,0,0,.06);
 }
 .teaser .art::after{
@@ -76,6 +76,13 @@
 
 /* Section divider */
 .divider{ height: 18px; background: radial-gradient(circle at 50% 120%, rgba(0,0,0,.08), transparent 45%), linear-gradient(90deg, transparent, rgba(0,0,0,.08), transparent); opacity:.35; }
-@media (max-width: 900px){ .teaser .art{ min-height: var(--art-h-mobile); } }
 
-.teaser.wallet .art{ min-height: var(--art-h-desktop); }
+/* === Alignment fix: consistent content max-width + right-anchored art ========== */
+.teaser .inner{ grid-template-columns: minmax(320px, 640px) 1fr; }
+.teaser .inner > div:first-child{ max-width: 640px; }
+/* Anchor the art to the right and give it a consistent visual width */
+.teaser .art{ justify-self: end; width: min(620px, 45vw); }
+@media (max-width: 1200px){ .teaser .art{ width: min(560px, 52vw); } }
+@media (max-width: 900px){ .teaser .art{ width: 100%; justify-self: stretch; } }
+/* Ensure wallet section uses the same rules explicitly */
+.teaser.wallet .art{ justify-self: end; }
