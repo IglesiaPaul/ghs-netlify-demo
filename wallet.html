@@ -1,66 +1,118 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Wallet — Global Hemp Service</title>
-  <link rel="stylesheet" href="assets/css/style.css"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wallet • Global Hemp Service</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/wallet.theme.yellow.css">
 </head>
-<body>
-  
-<header>
-  <div id="menu-overlay"></div>
-  <div class="nav">
-    <div class="logo"><span class="logo-badge"></span> Global Hemp Service <span class="badge" id="geo-badge"></span></div>
-    <nav id="main-menu" class="menu menu-panel"><a href="index.html">Home</a><a href="marketplace.html">Marketplace</a><a href="services.html">Services</a><a href="knowledge.html">Knowledge</a><a href="carbon.html">Carbon Program</a><a href="token.html">Token Ecosystem</a><a href="partner.html">Partner with Us</a><a href="about.html">About</a><a href="contact.html">Contact</a><a href="wallet.html" style="background: rgba(56,226,181,.12)">Wallet</a></nav>
-    <div class="actions">
-      <a href="cart.html" class="btn ghost">Cart <span class="badge" id="cart-badge">0</span></a>
-      <button id="menu-toggle" class="hamburger" aria-label="Menu" aria-controls="main-menu" aria-expanded="false"><span></span></button>
+<body class="wallet-bg">
+  <header>
+    <div class="nav container">
+      <div class="logo">
+        <a href="index.html" class="brand-link">
+          <span class="logo-badge"></span>
+          <span class="brand-name">Global Hemp Service</span>
+        </a>
+        <span class="badge" id="geo-badge"></span>
+      </div>
+      <nav id="main-menu" class="menu">
+        <a href="marketplace.html" class="btn ghost purple">Marketplace</a>
+        <a href="wallet.html" class="btn ghost yellow glow">Wallet <span class="badge" id="cart-badge">0</span></a>
+        <a href="carbon-lab.html" class="btn ghost green">Carbon Lab</a>
+        <a href="services.html">Services</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html" class="btn ghost green">Cart</a>
+      </nav>
+      <div class="actions">
+        <a href="cart.html" class="btn ghost">Cart <span class="badge" id="cart-badge-dup">0</span></a>
+        <button id="menu-toggle" class="hamburger" aria-label="Menu" aria-controls="main-menu" aria-expanded="false"><span></span></button>
+      </div>
     </div>
-  </div>
-</header>
-<script>
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const el = document.getElementById("geo-badge");
-    if(el) el.textContent = tz;
-  } catch(e) {}
-</script>
+  </header>
 
-  
-<div class="container">
-  <h1>Your Wallet</h1>
-  <div class="wallet">
-    <div class="card">
-      <h3>ID & Member Card</h3>
-      <p><b>Name:</b> Guest User</p>
-      <p><b>Member Tier:</b> <span id="token-tier">Green</span></p>
-    </div>
-    <div class="card">
-      <h3>Balance</h3>
-      <div style="font-size:42px; font-weight:800"><span id="token-balance">0</span> WETAS</div>
-      <p class="small">Earn WETAS when you checkout. Perks vary by category.</p>
-    </div>
-  </div>
-  <h3 style="margin-top:20px">Project Spotlight</h3>
-  <div id="spotlight" class="grid cols-3"></div>
-  <h3 style="margin-top:20px">Redeem</h3>
-  <div class="grid cols-3">
-    <div class="card"><b>Free Shipping</b> — 120 WETAS</div>
-    <div class="card"><b>10% Apparel Discount</b> — 200 WETAS</div>
-    <div class="card"><b>Hempcrete Voucher</b> — 600 WETAS</div>
-  </div>
-</div>
-<script>document.addEventListener("DOMContentLoaded", renderWallet);</script>
+  <main class="container wallet-page">
+    <!-- Wallet summary -->
+    <section class="card wallet-summary">
+      <header class="row">
+        <h1>WETAS Wallet</h1>
+        <div class="right">
+          <button id="reset-btn" class="btn subtle">Reset demo</button>
+        </div>
+      </header>
+      <div class="grid two">
+        <div class="balance">
+          <div class="balance-num" id="token-balance">0</div>
+          <div class="balance-label">WETAS balance</div>
+          <div class="tier">Tier: <span id="token-tier">—</span></div>
+          <div class="cta-row">
+            <a href="marketplace.html" class="btn primary yellow">Earn more</a>
+            <a href="carbon-lab.html" class="btn ghost yellow">Carbon Lab</a>
+          </div>
+        </div>
+        <div class="wallet-card">
+          <div class="chip">Member since • 2025</div>
+          <div class="wallet-id">Wallet ID: GHS-WLLT-0001</div>
+          <div class="progress">
+            <div class="bar"><span style="width: 58%"></span></div>
+            <div class="muted small">42% to next tier</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  
-<footer>
-  <div class="container small">
-    <div>© 2025 Global Hemp Service — Demo. | <a href="privacy.html">Privacy</a> | <a href="terms.html">Terms</a> | <a href="cookies.html">Cookies</a></div>
-  </div>
-</footer>
-<script src="assets/js/app.js?v=2025-08-11-4"></script>
+    <!-- Divider -->
+    <div class="divider"></div>
 
+    <!-- Project spotlights -->
+    <section class="card spotlights">
+      <header><h2>Project spotlights</h2></header>
+      <div id="spotlight" class="spot-grid">
+        <!-- Filled by app.js → renderWallet() -->
+      </div>
+    </section>
 
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- Redeem -->
+    <section class="card redeem">
+      <header><h2>Redeem WETAS</h2></header>
+      <div class="redeem-grid">
+        <article class="redeem-card">
+          <h3>Plant-a-Plot</h3>
+          <p>Offset micro-plots on partner hemp farms.</p>
+          <div class="row space">
+            <span class="chip soft">100 WETAS</span>
+            <button class="btn primary yellow">Redeem</button>
+          </div>
+        </article>
+        <article class="redeem-card">
+          <h3>EcoBuild Voucher</h3>
+          <p>Get a discount on hempcrete materials.</p>
+          <div class="row space">
+            <span class="chip soft">250 WETAS</span>
+            <button class="btn primary yellow">Redeem</button>
+          </div>
+        </article>
+        <article class="redeem-card">
+          <h3>Community Grant</h3>
+          <p>Support local regenerative projects.</p>
+          <div class="row space">
+            <span class="chip soft">400 WETAS</span>
+            <button class="btn primary yellow">Redeem</button>
+          </div>
+        </article>
+      </div>
+      <p class="muted small">Redemptions are for demo purposes only.</p>
+    </section>
+  </main>
+
+  <footer class="container small muted" style="margin: 40px auto 60px;">© Global Hemp Service</footer>
+
+  <script src="assets/js/app.js?v=2025-08-12-11" defer></script>
+  <script src="assets/js/brand.header.js" defer></script>
 </body>
 </html>
