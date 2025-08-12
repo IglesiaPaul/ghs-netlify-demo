@@ -6,9 +6,11 @@
   <title>Marketplace — Global Hemp Service</title>
   <link rel="stylesheet" href="assets/css/style.css"/>
   <link rel="stylesheet" href="assets/css/style.homehero.css"/>
+  <!-- Purple theme override for marketplace -->
+  <link rel="stylesheet" href="assets/css/theme.marketplace.purple.css"/>
   <link rel="icon" href="data:,">
 </head>
-<body>
+<body class="marketplace-theme">
   <header>
     <div id="menu-overlay"></div>
     <div class="nav">
@@ -38,14 +40,12 @@
       <p class="small">Browse hemp-forward products across brands and categories.</p>
     </header>
 
-    <!-- Optional: simple filter row (non-functional placeholder) -->
     <div class="grid cols-3" style="margin-bottom:10px">
       <div class="card"><b>Category</b><br/><span class="small">All</span></div>
       <div class="card"><b>Brand</b><br/><span class="small">All</span></div>
       <div class="card"><b>Sort</b><br/><span class="small">Relevance</span></div>
     </div>
 
-    <!-- Grid target for renderProducts(...) -->
     <section class="home-hero">
       <div id="market-grid" class="grid"></div>
     </section>
@@ -58,8 +58,7 @@
   <script>
     try { const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; const el = document.getElementById("geo-badge"); if (el) el.textContent = tz; } catch(e){}
   </script>
-  <script src="assets/js/app.js?v=2025-08-12-3" defer></script>
-  <script src="assets/js/app.patches.js?v=2025-08-12-2" defer></script>
-  <script src="assets/js/home.hero.js?v=2025-08-11-13" defer></script>
+  <script src="assets/js/app.js?v=2025-08-12-6" defer></script>
+  <script src="assets/js/brand.header.js" defer></script>
 </body>
 </html>
