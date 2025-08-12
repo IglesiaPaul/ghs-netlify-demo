@@ -1,0 +1,61 @@
+
+/* tokens.css — Global Hemp Service (minimal design tokens)
+   Load this BEFORE your existing style.css on every page.
+*/
+
+:root{
+  /* Brand primaries */
+  --green: #38E2B5;
+  --green-700: #19B895;
+  --purple: #7A5AF8;
+  --purple-100: #F2EEFF;
+  --purple-900: #3A2E7B;
+  --yellow: #FFC940;
+
+  /* Neutrals */
+  --ink-900: #1F2937;
+  --ink-700: #374151;
+  --ink-600: #4B5563;
+  --muted: #6B7280;
+  --white: #FFFFFF;
+  --bg: #FAFAFF;   /* light purple-ish site background */
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius: 16px;
+  --radius-lg: 24px;
+
+  /* Spacing scale */
+  --space-1: 4px; 
+  --space-2: 8px; 
+  --space-3: 12px; 
+  --space-4: 16px;
+  --space-5: 20px; 
+  --space-6: 24px; 
+  --space-8: 32px; 
+  --space-10: 40px; 
+  --space-16: 64px;
+
+  /* Type scale */
+  --fs-0: 12px; 
+  --fs-1: 14px; 
+  --fs-2: 16px; 
+  --fs-3: 18px; 
+  --fs-4: 20px; 
+  --fs-5: 24px; 
+  --fs-6: 32px; 
+  --fs-7: 40px;
+
+  /* Shadows */
+  --shadow-soft: 0 2px 12px rgba(16,24,40,.06);
+  --shadow: 0 6px 24px rgba(16,24,40,.08);
+
+  /* Contextual accent (override per page/body) */
+  --accent: var(--purple); /* default */
+}
+
+/* Optional: set contextual accent per section/page */
+.theme-market { --accent: var(--purple); }
+.theme-wallet { --accent: var(--yellow); }
+
+/* (No resets/utilities here to avoid breaking existing styles) */
