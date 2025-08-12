@@ -231,26 +231,48 @@ function renderWallet(){
     return raw || '';
   }
 
-  function rebuild(){
-    const src = document.getElementById('main-menu') || document.querySelector('.menu');
-    if (!src) return;
-    const seen = new Set(); menu.innerHTML = '';
-    src.querySelectorAll('a').forEach(a=>{
-      let key = normalizeHref(a.getAttribute('href'));
-      if (!key || seen.has(key)) return; seen.add(key);
-      const c = a.cloneNode(true); c.removeAttribute('id');
-      if (key === 'carbon-lab.html') c.setAttribute('href','carbon-lab.html');
-      c.addEventListener('click', ()=>{ close(); });
-      menu.appendChild(c);
-    });
-    // Cart link with live badge if present
-    const cartLink = Array.from(menu.querySelectorAll('a')).find(a=>/cart/i.test((a.getAttribute('href')||'') + (a.textContent||'')));
-    if (cartLink){
-      let b = cartLink.querySelector('.badge');
-      if (!b){ b = document.createElement('span'); b.className='badge'; cartLink.appendChild(b); }
-      b.id = 'drawer-cart-badge'; b.textContent = String(State.cart.reduce((a,b)=>a+(b.qty||0),0));
+  // canonical menu used on ALL pages
+const CANON_MENU = [
+  { href: 'marketplace.html', text: 'Marketplace', cls: 'btn ghost purple' },
+  { href: 'wallet.html',      text: 'Wallet',      cls: 'btn ghost yellow glow' },
+  { href: 'carbon-lab.html',  text: 'Carbon Lab',  cls: 'btn ghost green' },
+  { href: 'services.html',    text: 'Services' },
+  { href: 'about.html',       text: 'About' },
+  { href: 'contact.html',     text: 'Contact' },
+  { href: 'cart.html',        text: 'Cart' },
+];
+
+function rebuild(){
+  // always build from the canonical array (ignore per-page #main-menu)
+  menu.innerHTML = '';
+
+  const current = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+
+  CANON_MENU.forEach(item => {
+    const a = document.createElement('a');
+    a.href = item.href;
+    a.textContent = item.text;
+    if (item.cls) a.className = item.cls;
+
+    // normalize carbon-lab to .html just in case
+    if (/^carbon-lab($|\/|#|\?)/i.test(item.href)) a.href = 'carbon-lab.html';
+
+    // mark active link based on current page
+    if (current === item.href.toLowerCase()) a.classList.add('active');
+
+    // add live cart badge to Cart link
+    if (/cart\.html$/i.test(item.href)) {
+      const b = document.createElement('span');
+      b.className = 'badge';
+      b.id = 'drawer-cart-badge';
+      b.textContent = String(State.cart.reduce((s,i)=>s+(i.qty||0),0));
+      a.appendChild(b);
     }
-  }
+
+    menu.appendChild(a);
+  });
+}
+
 
   function open(){ rebuild(); panel.classList.add('open'); overlay.classList.add('open'); document.body.style.overflow='hidden'; setAria(true); }
   function close(){ panel.classList.remove('open'); overlay.classList.remove('open'); document.body.style.overflow=''; setAria(false); }
