@@ -58,6 +58,22 @@
   <script src="assets/js/app.js?v=2025-08-12-6" defer></script>
   <script src="assets/js/brand.header.js" defer></script>
   <script src="assets/js/card.cta.override.js" defer></script>
-  <script src="assets/js/market.force.js" defer></script>
+  <!-- Inline force-render helper -->
+  <script>
+    (function(){
+      function force(){
+        var grid=document.getElementById('market-grid');
+        if(!grid) return;
+        var list=(window.State && Array.isArray(State.products) && State.products.length)
+          ? State.products
+          : (window.Catalog && Array.isArray(window.Catalog) ? window.Catalog : []);
+        if(typeof window.renderProducts==='function'){
+          window.renderProducts('market-grid', list);
+        }
+      }
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', force);
+      else force();
+    })();
+  </script>
 </body>
 </html>
