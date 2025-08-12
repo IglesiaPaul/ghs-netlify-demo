@@ -119,13 +119,11 @@ const TokenRules = { Apparel: 2, Food: 3, Construction: 8, Wellness: 2, Accessor
 State.products = Catalog;
 
 /* --------------- Cart + Wallet --------------- */
-
-function addToCart(id) {
-  const p = Catalog.find((x) => x.id === id);
-  if (!p) return;
-  const found = State.cart.find((x) => x.id === id);
-  if (found) found.qty += 1;
-  else State.cart.push({ ...p, qty: 1 }function renderCartBadge() {
+function addToCart(id){
+  const p = Catalog.find(x => x.id === id);
+  if(!p) return;
+  const found = State.cart.find(x => x.id === id);
+  if(found) found.qty += 1; else State.cart.push({ ...p, qty: 1 }function renderCartBadge() {
   const n = State.cart.reduce((a, b) => a + b.qty, 0);
   const el = document.querySelector("#cart-badge");
   if (el) el.textContent = n;
@@ -139,14 +137,11 @@ function currency(n) {
 }
 
 /* === Unified product renderer (home + marketplace cards) === */
-
-function renderProducts(containerId, items) {
+function renderProducts(containerId, items){
   const el = document.getElementById(containerId) || document.querySelector(containerId);
-  if (!el) return;
-  if (!el.classList.contains('grid')) el.classList.add('grid');
-
-  const list = Array.isArray(items) ? items : (window.State && Array.isArray(State.products) ? State.products : []);
-
+  if(!el) return;
+  if(!el.classList.contains('grid')) el.classList.add('grid');
+  const list = Array.isArray(items) ? items : ((window.State && Array.isArray(State.products)) ? State.products : []);
   el.innerHTML = list.map(p => {
     const brand = p.brand || p.vendor || p.company || "";
     const category = p.category || "";
@@ -171,17 +166,16 @@ function renderProducts(containerId, items) {
     </article>`;
   }).join("");
 
-  // Event delegation for add buttons (bind once, capture phase to avoid duplicates)
-  if (!el.__ghsAddBound){
-    el.addEventListener("click", (e) => {
-      const btn = e.target.closest("button[data-add]");
-      if (!btn || !el.contains(btn)) return;
+  if(!el.__ghsAddBound){
+    el.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-add]');
+      if(!btn || !el.contains(btn)) return;
       e.preventDefault();
       e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-      const id = parseInt(btn.getAttribute("data-add"), 10);
-      if (!isNaN(id)) addToCart(id);
-    }, true); // capture
+      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+      const id = parseInt(btn.getAttribute('data-add'), 10);
+      if(!isNaN(id)) addToCart(id);
+    }, true);
     el.__ghsAddBound = true;
   }
 }
@@ -730,4 +724,57 @@ a.cart-link .badge{ background:#0d1b16; color:#c8fff0; border:1px solid #143d31;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
   else bind();
+})();
+
+/* --------------- Header Drawer (desktop & mobile) -------------------- */
+(function(){
+  if (window.__ghsDrawerInit) return; window.__ghsDrawerInit = true;
+  if (!document.getElementById('ghs-drawer-style')){
+    const s = document.createElement('style'); s.id='ghs-drawer-style';
+    s.textContent = `
+      #main-menu.menu-panel{
+        position: fixed; inset: 0 auto 0 0; width: min(86vw, 360px);
+        transform: translateX(-100%); transition: transform .2s ease;
+        background:#fff; z-index:4000; overflow:auto; padding:16px;
+        box-shadow: 8px 0 30px rgba(0,0,0,.1);
+      }
+      body.drawer-open #main-menu.menu-panel{ transform: translateX(0); }
+      #ghs-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.32); z-index:3990; display:none; }
+      body.drawer-open #ghs-overlay{ display:block; }
+      @media (min-width: 900px){
+        .nav > .menu{ position: static; transform:none !important; width:auto; display:none; }
+      }
+    `;
+    document.head.appendChild(s);
+  }
+  function ensureOverlay(){
+    let ov = document.getElementById('ghs-overlay');
+    if(!ov){ ov = document.createElement('div'); ov.id='ghs-overlay'; document.body.appendChild(ov); ov.addEventListener('click', ()=>document.body.classList.remove('drawer-open')); }
+    return ov;
+  }
+  function bind(){
+    const btn = document.getElementById('menu-toggle');
+    const menu = document.getElementById('main-menu');
+    if(!btn || !menu) return;
+    ensureOverlay();
+    if(!btn.__ghsBound){
+      btn.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+        document.body.classList.toggle('drawer-open');
+      }, true);
+      btn.__ghsBound = true;
+    }
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') document.body.classList.remove('drawer-open'); });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bind); else bind();
+})();
+
+/* --------------- Auto init for product grids ------------------------- */
+(function(){
+  function go(){
+    var list = (window.State && Array.isArray(State.products)) ? State.products : (window.Catalog || []);
+    if (document.getElementById('products-grid') && typeof renderProducts==='function') renderProducts('products-grid', list);
+    if (document.getElementById('market-grid') && typeof renderProducts==='function') renderProducts('market-grid', list);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
